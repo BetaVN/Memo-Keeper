@@ -2,8 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/memo_option"
-        android:id="@+id/action_options"
-        android:icon="@mipmap/icon_options"
-        app:showAsAction="always"/>
+        android:title="@string/memo_save"
+        android:id="@+id/action_save"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="@string/memo_exit"
+        android:id="@+id/action_exit"
+        app:showAsAction="never"/>
 </menu>

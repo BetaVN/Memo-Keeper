@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Memo Keeper</string>
 
-    <string name="memo_option">File</string>
+    <string name="memo_save">Save memo</string>
+
+    <string name="memo_exit">Exit</string>
+
 </resources>
