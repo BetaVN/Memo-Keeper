@@ -20,7 +20,7 @@
         android:testOnly="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.memokeeper.MemoEditActivity"
+            android:name="com.example.memokeeper.MemoEditor.MemoEditActivity"
             android:label="MemoEditActivity" />
         <activity android:name="com.example.memokeeper.MainActivity" >
             <intent-filter>

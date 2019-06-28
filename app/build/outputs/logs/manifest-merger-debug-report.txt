@@ -7,9 +7,9 @@ INJECTED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/Andr
 MERGED from [com.android.support:design:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/9c65adbd2587ca9c3e56184b7ccc029d/AndroidManifest.xml:17:1-24:12
 MERGED from [com.android.support:appcompat-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support.constraint:constraint-layout:1.1.3] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/a7cbbfc44d7dff9e29e5ccc014b3d835/AndroidManifest.xml:2:1-11:12
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-fragment:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/12cab88f41bdefb771bd5770f3362913/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:animated-vector-drawable:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ef73510a74a49a36a66b7c3b6b3c80b9/AndroidManifest.xml:17:1-22:12
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-core-ui:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/5eeb139cb9e67536765c6f98d14358c1/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-core-utils:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/d3392c19b1de37e8011697c0306f672e/AndroidManifest.xml:17:1-22:12
 MERGED from [com.android.support:support-vector-drawable:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/922fbcafb7ece2428bd036ce53d88d51/AndroidManifest.xml:17:1-22:12
@@ -76,12 +76,12 @@ MERGED from [com.android.support:versionedparcelable:28.0.0] /home/cpu10856/.gra
 		ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:6:9-35
 	android:theme
 		ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:11:9-40
-activity#com.example.memokeeper.MemoEditActivity
-ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:12:9-14:61
+activity#com.example.memokeeper.MemoEditor.MemoEditActivity
+ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:12:9-14:48
 	android:label
 		ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:14:13-45
 	android:name
-		ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:13:13-45
+		ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:13:13-56
 activity#com.example.memokeeper.MainActivity
 ADDED from /home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:15:9-21:20
 	android:name
@@ -106,12 +106,12 @@ MERGED from [com.android.support:appcompat-v7:28.0.0] /home/cpu10856/.gradle/cac
 MERGED from [com.android.support:appcompat-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support.constraint:constraint-layout:1.1.3] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/a7cbbfc44d7dff9e29e5ccc014b3d835/AndroidManifest.xml:5:5-7:41
 MERGED from [com.android.support.constraint:constraint-layout:1.1.3] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/a7cbbfc44d7dff9e29e5ccc014b3d835/AndroidManifest.xml:5:5-7:41
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-fragment:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/12cab88f41bdefb771bd5770f3362913/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-fragment:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/12cab88f41bdefb771bd5770f3362913/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:animated-vector-drawable:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ef73510a74a49a36a66b7c3b6b3c80b9/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:animated-vector-drawable:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ef73510a74a49a36a66b7c3b6b3c80b9/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:20:5-44
-MERGED from [com.android.support:recyclerview-v7:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/37b4fdb59de2307784d9f4147b9ce9ab/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-core-ui:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/5eeb139cb9e67536765c6f98d14358c1/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-core-ui:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/5eeb139cb9e67536765c6f98d14358c1/AndroidManifest.xml:20:5-44
 MERGED from [com.android.support:support-core-utils:28.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/d3392c19b1de37e8011697c0306f672e/AndroidManifest.xml:20:5-44
