@@ -5,4 +5,6 @@
 
     <string name="memo_exit">Exit</string>
 
+    <string name="memo_title">Title</string>
+
 </resources>

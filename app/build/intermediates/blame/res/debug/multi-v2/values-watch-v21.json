@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-watch-v21/values-watch-v21.xml",
+            "map": [
+                {
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/values-watch-v21/values-watch-v21.xml",
+                    "from": {
+                        "startLines": "2,6,10",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,271,499",
+                        "endLines": "5,9,13",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "266,494,724"
+                    }
+                }
+            ]
+        }
+    ]
+}
