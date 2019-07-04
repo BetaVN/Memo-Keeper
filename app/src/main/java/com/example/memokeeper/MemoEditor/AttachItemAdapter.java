@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.example.memokeeper.R;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.ItemHolder> {
 
@@ -27,9 +27,9 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
         }
     }
 
-    private List<AttachedItem> itemList;
+    private ArrayList<AttachedItem> itemList;
 
-    public AttachItemAdapter(List<AttachedItem> items){
+    public AttachItemAdapter(ArrayList<AttachedItem> items){
         itemList = items;
     }
 

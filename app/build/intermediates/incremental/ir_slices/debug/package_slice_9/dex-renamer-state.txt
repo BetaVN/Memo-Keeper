@@ -1,4 +1,4 @@
-#Mon Jul 01 11:16:13 ICT 2019
+#Wed Jul 03 11:04:21 ICT 2019
 base.0=/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/transforms/dexMerger/debug/9
 path.0=classes.dex
 renamed.0=classes.dex
