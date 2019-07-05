@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
 
+
 public class MainActivity extends AppCompatActivity {
 
     final private Context CONTEXT = this;

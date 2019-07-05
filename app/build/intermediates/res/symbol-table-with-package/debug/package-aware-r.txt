@@ -1077,6 +1077,7 @@ id center_vertical
 id chains
 id checkbox
 id chronometer
+id clearButton
 id clip_horizontal
 id clip_vertical
 id collapseActionView
@@ -1121,7 +1122,6 @@ id icon
 id icon_group
 id ifRoom
 id image
-id imageView2
 id info
 id invisible
 id italic

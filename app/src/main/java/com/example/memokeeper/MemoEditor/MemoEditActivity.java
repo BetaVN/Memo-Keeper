@@ -1,27 +1,36 @@
 package com.example.memokeeper.MemoEditor;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.memokeeper.Constants.INTENT_CODE;
+import com.example.memokeeper.Constants.REQUEST_CODE;
+import com.example.memokeeper.Utilities.PathUtils;
 import com.example.memokeeper.R;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class MemoEditActivity extends AppCompatActivity {
+    final private Context context = this;
+    final private int PERMISSION_REQUEST = 1;
+
     private MenuInflater inflater;
     private String memoContent;
     private String memoTitle;
@@ -36,18 +45,34 @@ public class MemoEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_memo);
+
+        if (ContextCompat.checkSelfPermission(MemoEditActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MemoEditActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            }
+        }
+
         Toolbar editToolbar = findViewById(R.id.memoEditBar);
         titleField = findViewById(R.id.titleEditText);
         textField = findViewById(R.id.memoEditText);
         attachedItems = findViewById(R.id.attachedItemList);
         items = new ArrayList<>();
 
-        attachItemAdapter = new AttachItemAdapter(items);
+        attachItemAdapter = new AttachItemAdapter(items, context);
         attachedItems.setAdapter(attachItemAdapter);
         attachedItems.setLayoutManager(new LinearLayoutManager(this));
 
         setSupportActionBar(editToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
+
+
     }
 
     @Override
@@ -72,13 +97,13 @@ public class MemoEditActivity extends AppCompatActivity {
             case R.id.action_add_file:
                 intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("file/*");
-                startActivityForResult(intent, INTENT_CODE.MEMO_PICK_FILE);
+                startActivityForResult(intent, REQUEST_CODE.MEMO_PICK_FILE);
                 return true;
 
             case R.id.action_add_photos:
                 intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent, INTENT_CODE.MEMO_PICK_IMAGE);
+                startActivityForResult(intent, REQUEST_CODE.MEMO_PICK_IMAGE);
                 return true;
 
             default:
@@ -89,21 +114,21 @@ public class MemoEditActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case INTENT_CODE.MEMO_PICK_FILE:
+            case REQUEST_CODE.MEMO_PICK_FILE:
                 if(resultCode==RESULT_OK){
-                    String filePath = data.getData().getPath();
+                    Uri content = data.getData();
+                    String filePath = PathUtils.getPath(context, content);
                     File newFile = new File(filePath);
                     items.add(new AttachedItem(newFile.getName(), false, filePath));
-                    Log.d("Filepath", filePath);
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
                 }
 
-            case INTENT_CODE.MEMO_PICK_IMAGE:
+            case REQUEST_CODE.MEMO_PICK_IMAGE:
                 if(resultCode==RESULT_OK){
-                    String filePath = data.getData().getPath();
+                    Uri content = data.getData();
+                    String filePath = PathUtils.getPath(context, content);
                     File newFile = new File(filePath);
                     items.add(new AttachedItem(newFile.getName(), true, filePath));
-                    Log.d("Filepath", filePath);
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
                 }
         }

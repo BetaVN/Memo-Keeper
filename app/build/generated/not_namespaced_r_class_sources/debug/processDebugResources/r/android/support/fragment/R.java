@@ -96,10 +96,10 @@ public final class R {
         public static final int blocking = 0x7f080026;
         public static final int bottom = 0x7f080027;
         public static final int chronometer = 0x7f08002f;
-        public static final int end = 0x7f080044;
-        public static final int forever = 0x7f080051;
-        public static final int icon = 0x7f080058;
-        public static final int icon_group = 0x7f080059;
+        public static final int end = 0x7f080045;
+        public static final int forever = 0x7f080052;
+        public static final int icon = 0x7f080059;
+        public static final int icon_group = 0x7f08005a;
         public static final int info = 0x7f08005d;
         public static final int italic = 0x7f08005f;
         public static final int left = 0x7f080063;
