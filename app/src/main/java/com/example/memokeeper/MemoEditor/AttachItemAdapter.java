@@ -1,27 +1,32 @@
 package com.example.memokeeper.MemoEditor;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.memokeeper.R;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.ItemHolder> {
 
     public class ItemHolder extends RecyclerView.ViewHolder {
         public ImageView imageFileType;
-        public TextView fileName;
+        public Button fileName;
         public Button clearButton;
 
         public ItemHolder(@NonNull View itemView) {
@@ -59,7 +64,7 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
 
     @Override
     public void onBindViewHolder(final AttachItemAdapter.ItemHolder itemHolder, final int position) {
-        AttachedItem newItem = itemList.get(position);
+        final AttachedItem newItem = itemList.get(position);
 
         itemHolder.fileName.setText(newItem.fileName);
 
@@ -89,6 +94,25 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
                     }
                 });
                 confirmDialog.show();
+            }
+        });
+
+        itemHolder.fileName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                File file = new File(newItem.filePath);
+                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
+                Log.d("Ext", ""+ mimeType);
+                Log.d("Res", "" + newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
+                newIntent.setDataAndType(Uri.fromFile(file),mimeType);
+                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                try {
+                    context.startActivity(newIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

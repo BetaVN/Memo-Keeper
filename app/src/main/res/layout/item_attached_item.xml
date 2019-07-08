@@ -17,14 +17,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_file_type" />
 
-    <TextView
+    <Button
         android:id="@+id/fileName"
         android:layout_width="282dp"
         android:layout_height="33dp"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:text="TextView"
+        android:text=""
+        android:background="@null"
+        android:gravity="left|center_vertical"
         app:layout_constraintStart_toEndOf="@+id/fileType"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,5 +40,7 @@
         android:background="@drawable/ic_clear"
         app:layout_constraintStart_toEndOf="@+id/fileName"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 
 </android.support.constraint.ConstraintLayout>

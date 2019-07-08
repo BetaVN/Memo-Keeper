@@ -122,4 +122,24 @@ public class PathUtils {
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
+
+    public static String getFileExtension(final String url) {
+        String temp = url;
+        if (temp.indexOf("?") > -1) {
+            temp = temp.substring(0, temp.indexOf("?"));
+        }
+        if (temp.lastIndexOf(".") == -1) {
+            return null;
+        } else {
+            String ext = temp.substring(temp.lastIndexOf(".") + 1);
+            if (ext.indexOf("%") > -1) {
+                ext = ext.substring(0, ext.indexOf("%"));
+            }
+            if (ext.indexOf("/") > -1) {
+                ext = ext.substring(0, ext.indexOf("/"));
+            }
+            return ext.toLowerCase();
+
+        }
+    }
 }
