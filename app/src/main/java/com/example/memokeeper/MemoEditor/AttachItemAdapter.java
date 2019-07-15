@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -100,19 +101,27 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
         itemHolder.fileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                File file = new File(newItem.filePath);
-                Intent newIntent = new Intent(Intent.ACTION_VIEW);
-                String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
-                Log.d("Ext", ""+ mimeType);
-                Log.d("Res", "" + newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
-                newIntent.setDataAndType(Uri.fromFile(file),mimeType);
-                newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                try {
-                    context.startActivity(newIntent);
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
+                if (android.os.Build.VERSION.SDK_INT < 24) {
+                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                    File file = new File(newItem.filePath);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
+                    Log.d("Ext", "" + mimeType);
+                    Log.d("Res", "" + newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
+                    intent.setDataAndType(Uri.fromFile(file), mimeType);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    try {
+                        context.startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
+                    }
                 }
+                /*else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    File file = new File(newItem.filePath);
+                    Uri data = FileProvider.getUriForFile(context, "com.example.memokeeper.fileProvider", file);
+                TODO: Implement FileProvider for Android 8+
+                }*/
             }
         });
 
