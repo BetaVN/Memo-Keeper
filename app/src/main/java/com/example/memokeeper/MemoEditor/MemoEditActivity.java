@@ -170,11 +170,4 @@ public class MemoEditActivity extends AppCompatActivity {
     private void exitActivity() {
         super.finish();
     }
-
-    /*private ArrayList<AttachedItem> addDummyItem() {
-        ArrayList<AttachedItem> newDummyList = new ArrayList<>();
-        newDummyList.add(new AttachedItem("Sample File.txt", false, ""));
-        newDummyList.add(new AttachedItem("Sample image.txt", true, ""));
-        return newDummyList;
-    }*/
 }

@@ -106,8 +106,6 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
                     File file = new File(newItem.filePath);
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
-                    Log.d("Ext", "" + mimeType);
-                    Log.d("Res", "" + newItem.filePath.substring(newItem.filePath.lastIndexOf(".")));
                     intent.setDataAndType(Uri.fromFile(file), mimeType);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     try {

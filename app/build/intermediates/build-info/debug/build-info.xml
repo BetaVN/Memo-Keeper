@@ -6,7 +6,7 @@
     density="420dpi"
     format="10"
     plugin-version="3.4.0"
-    timestamp="1563159671253"
+    timestamp="1563164351871"
     token="-2719139745434900375"
     verifier="FULL_BUILD_REQUESTED" >
 
@@ -24,9 +24,6 @@
         duration="0" />
 
     <artifact
-        location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/resources/instant-run/debug/resources-debug.apk"
-        type="SPLIT" />
-    <artifact
         location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/slices/slice_2.apk"
         type="SPLIT" />
     <artifact
@@ -40,6 +37,9 @@
         type="SPLIT" />
     <artifact
         location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/dep/dependencies.apk"
+        type="SPLIT" />
+    <artifact
+        location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/resources/instant-run/debug/resources-debug.apk"
         type="SPLIT" />
     <artifact
         location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/slices/slice_0.apk"
@@ -65,11 +65,8 @@
 
     <build
         build-mode="FULL"
-        timestamp="1563159671253"
+        timestamp="1563164351871"
         verifier="FULL_BUILD_REQUESTED" >
-        <artifact
-            location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/resources/instant-run/debug/resources-debug.apk"
-            type="SPLIT" />
         <artifact
             location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/slices/slice_2.apk"
             type="SPLIT" />
@@ -84,6 +81,9 @@
             type="SPLIT" />
         <artifact
             location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/dep/dependencies.apk"
+            type="SPLIT" />
+        <artifact
+            location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/resources/instant-run/debug/resources-debug.apk"
             type="SPLIT" />
         <artifact
             location="/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/split-apk/debug/slices/slice_0.apk"
