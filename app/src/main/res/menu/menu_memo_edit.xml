@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="Add Files"
+        android:id="@+id/action_add_file"
+        android:icon="@drawable/ic_attach_file"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:title="Add Photos"
+        android:id="@+id/action_add_photos"
+        android:icon="@drawable/ic_attach_photos"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:title="@string/memo_save"
+        android:id="@+id/action_save"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="@string/memo_exit"
+        android:id="@+id/action_exit"
+        app:showAsAction="never"/>
+</menu>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/memoEditBar"
+        android:layout_width="411dp"
+        android:layout_height="56dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/titleEditText"
+        android:layout_width="411dp"
+        android:layout_height="72dp"
+        android:ems="10"
+        android:hint="@string/memo_title"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/textAttachedItems"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/memoEditBar"
+        app:layout_constraintVertical_bias="0.0" />
+    <TextView
+        android:id="@+id/textAttachedItems"
+        android:layout_width="411dp"
+        android:layout_height="20dp"
+        android:ems="10"
+        android:text="Attached Files"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toTopOf="@id/attachedItemList"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleEditText" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/attachedItemList"
+        android:layout_width="411dp"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toTopOf="@id/memoEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textAttachedItems" />
+
+    <EditText
+        android:id="@+id/memoEditText"
+        android:layout_width="411dp"
+        android:layout_height="491dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="@string/memo_text"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/attachedItemList" />
+
+
+
+
+</android.support.constraint.ConstraintLayout>
