@@ -384,6 +384,10 @@
         "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/5b2dd487a02299e4d97e0e3d6b099d2e/res/drawable-hdpi-v4/notification_bg_low_pressed.9.png"
     },
     {
+        "merged": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/res/merged/debug/menu_menu_base.xml.flat",
+        "source": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/res/menu/menu_base.xml"
+    },
+    {
         "merged": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/res/merged/debug/color_mtrl_btn_stroke_color_selector.xml.flat",
         "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/9c65adbd2587ca9c3e56184b7ccc029d/res/color/mtrl_btn_stroke_color_selector.xml"
     },
@@ -1306,6 +1310,10 @@
     {
         "merged": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/res/merged/debug/drawable-v21_abc_btn_colored_material.xml.flat",
         "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/drawable-v21/abc_btn_colored_material.xml"
+    },
+    {
+        "merged": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/res/merged/debug/drawable-anydpi_round_corners_blank.xml.flat",
+        "source": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/res/drawable-anydpi/round_corners_blank.xml"
     },
     {
         "merged": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/res/merged/debug/mipmap-xhdpi_ic_launcher.png.flat",
