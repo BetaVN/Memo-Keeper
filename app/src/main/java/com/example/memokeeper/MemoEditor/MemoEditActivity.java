@@ -72,6 +72,10 @@ public class MemoEditActivity extends AppCompatActivity {
         setSupportActionBar(editToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
 
+        Intent intent = getIntent();
+        titleField.setText(intent.getStringExtra("memoTitle"));
+        textField.setText(intent.getStringExtra("memoText"));
+
 
     }
 

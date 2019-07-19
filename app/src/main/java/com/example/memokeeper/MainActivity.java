@@ -11,6 +11,7 @@ import android.widget.Button;
 
 import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
+import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
 
 import java.util.ArrayList;
@@ -42,13 +43,14 @@ public class MainActivity extends AppCompatActivity {
         memoList = findViewById(R.id.memoList);
         memo = new ArrayList<>();
 
-        memo.add(new MemoInfo("This is a sample memo", "18/7/2019"));
-        memo.add(new MemoInfo("This is another sample memo", "19/7/2018"));
+        memo.add(new MemoInfo("This is a sample memo", "18/7/2019", "Please remember to feed the dog.\nAnd also pick up Carl from school"));
+        memo.add(new MemoInfo("This is another sample memo", "19/7/2018", "Vacation day. Things to do:\n\nBuy food\nBuy sunscreen\nBuy swimsuits"));
 
 
         memoAdapter = new MemoAdapter(memo, context);
         memoList.setAdapter(memoAdapter);
         memoList.setLayoutManager(new LinearLayoutManager(this));
+        memoList.addItemDecoration(new VerticalSpaceItemDecoration(5));
     }
 
 }

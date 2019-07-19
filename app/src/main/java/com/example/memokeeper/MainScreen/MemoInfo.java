@@ -2,10 +2,12 @@ package com.example.memokeeper.MainScreen;
 
 public class MemoInfo {
     public String memoTitle;
-    public String date;
+    public String memoText;
+    public String memoDate;
 
-    public MemoInfo(String title, String date) {
+    public MemoInfo(String title, String date, String text) {
         memoTitle = title;
-        this.date = date;
+        memoDate = date;
+        memoText = text;
     }
 }

@@ -1127,6 +1127,7 @@ id image
 id info
 id invisible
 id italic
+id item_memo
 id item_touch_helper_previous_elevation
 id labeled
 id largeLabel
