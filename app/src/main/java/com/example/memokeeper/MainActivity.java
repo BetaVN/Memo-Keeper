@@ -6,9 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.support.v7.widget.Toolbar;
 
+import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
@@ -21,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     final private Context context = this;
 
+    private MenuInflater inflater;
     private MemoAdapter memoAdapter;
     private ArrayList<MemoInfo> memo;
     private RecyclerView memoList;
@@ -29,17 +33,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Button testButton = findViewById(R.id.button);
 
-
-        /*testButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent modeSelection = new Intent(CONTEXT, MemoEditActivity.class);
-                startActivity(modeSelection);
-            }
-        });*/
-
+        Toolbar mainScreenToolbar = findViewById(R.id.mainScreenToolbar);
         memoList = findViewById(R.id.memoList);
         memo = new ArrayList<>();
 
@@ -51,6 +46,30 @@ public class MainActivity extends AppCompatActivity {
         memoList.setAdapter(memoAdapter);
         memoList.setLayoutManager(new LinearLayoutManager(this));
         memoList.addItemDecoration(new VerticalSpaceItemDecoration(5));
+
+        setSupportActionBar(mainScreenToolbar);
+        getSupportActionBar().setTitle("Memo Keeper");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_base, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        Intent intent;
+        switch (item.getItemId()){
+            case R.id.action_add_memo:
+                Intent INTENT = new Intent(context, MemoEditActivity.class);
+                startActivityForResult(INTENT, REQUEST_CODE.MEMO_EDIT);
+                return true;
+
+            default:
+                return false;
+        }
     }
 
 }

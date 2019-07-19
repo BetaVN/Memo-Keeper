@@ -1001,6 +1001,7 @@ drawable design_ic_visibility
 drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
+drawable ic_add
 drawable ic_attach_file
 drawable ic_attach_photos
 drawable ic_back
@@ -1037,6 +1038,7 @@ id META
 id SHIFT
 id SYM
 id action_add_file
+id action_add_memo
 id action_add_photos
 id action_bar
 id action_bar_activity_content
@@ -1136,6 +1138,7 @@ id line1
 id line3
 id listMode
 id list_item
+id mainScreenToolbar
 id masked
 id memoEditBar
 id memoEditText
