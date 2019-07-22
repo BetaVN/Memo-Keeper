@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +26,10 @@ import com.example.memokeeper.Utilities.PathUtils;
 import com.example.memokeeper.R;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MemoEditActivity extends AppCompatActivity {
@@ -37,6 +42,8 @@ public class MemoEditActivity extends AppCompatActivity {
     private EditText textField;
     private EditText titleField;
     private RecyclerView attachedItems;
+    private ArrayList<String> attachedFilePath;
+    private ArrayList<String> newFilePath;
 
     private AttachItemAdapter attachItemAdapter;
     private ArrayList<AttachedItem> items;
@@ -59,15 +66,32 @@ public class MemoEditActivity extends AppCompatActivity {
             }
         }
 
+        if (ContextCompat.checkSelfPermission(MemoEditActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MemoEditActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            }
+        }
+
         Toolbar editToolbar = findViewById(R.id.memoEditBar);
         titleField = findViewById(R.id.titleEditText);
         textField = findViewById(R.id.memoEditText);
         attachedItems = findViewById(R.id.attachedItemList);
         items = new ArrayList<>();
+        newFilePath = new ArrayList<>();
+        attachedFilePath = new ArrayList<>();
 
         attachItemAdapter = new AttachItemAdapter(items, context);
         attachedItems.setAdapter(attachItemAdapter);
         attachedItems.setLayoutManager(new LinearLayoutManager(this));
+
+        syncFilePath();
 
         setSupportActionBar(editToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
@@ -123,8 +147,15 @@ public class MemoEditActivity extends AppCompatActivity {
                     Uri content = data.getData();
                     String filePath = PathUtils.getPath(context, content);
                     File newFile = new File(filePath);
+                    Boolean success = addNewFilesLocal(newFile);
+                    if (success) {
+                        filePath = context.getFilesDir().getAbsolutePath() + newFile.getName();
+                    }
+                    Log.d("Path", filePath);
+                    newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), false, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
+                    syncFilePath();
                 }
 
             case REQUEST_CODE.MEMO_PICK_IMAGE:
@@ -132,8 +163,15 @@ public class MemoEditActivity extends AppCompatActivity {
                     Uri content = data.getData();
                     String filePath = PathUtils.getPath(context, content);
                     File newFile = new File(filePath);
+                    Boolean success = addNewFilesLocal(newFile);
+                    if (success) {
+                        filePath = context.getFilesDir().getAbsolutePath() + newFile.getName();
+                    }
+                    Log.d("Path", filePath);
+                    newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), true, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
+                    syncFilePath();
                 }
         }
     }
@@ -169,6 +207,34 @@ public class MemoEditActivity extends AppCompatActivity {
             }
         });
         confirmDialog.show();
+    }
+
+    private Boolean addNewFilesLocal(File newFile) {
+        try {
+            FileInputStream inputStream = new FileInputStream(newFile);
+            byte[] b = new byte[(int) newFile.length()];
+            inputStream.read(b);
+            inputStream.close();
+            FileOutputStream outputStream = new FileOutputStream(newFile);
+            outputStream.write(b);
+            outputStream.close();
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return false;
+    }
+
+    private void syncFilePath() {
+        ArrayList<String> syncedList = attachItemAdapter.returnFilePath();
+        if (syncedList.addAll(newFilePath)) {
+            attachedFilePath = syncedList;
+            attachItemAdapter.getNewFilePath(syncedList);
+        }
+        newFilePath.clear();
     }
 
     private void exitActivity() {

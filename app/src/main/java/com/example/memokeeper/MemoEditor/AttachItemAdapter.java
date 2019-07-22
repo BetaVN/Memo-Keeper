@@ -4,12 +4,12 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +41,7 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
 
     private ArrayList<AttachedItem> itemList;
     private Context context;
+    private ArrayList<String> pathList = new ArrayList<>();
 
     public AttachItemAdapter(ArrayList<AttachedItem> items, Context context){
         itemList = items;
@@ -114,14 +115,29 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
                         Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
                     }
                 }
-                /*else {
+                else {
+                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     File file = new File(newItem.filePath);
-                    Uri data = FileProvider.getUriForFile(context, "com.example.memokeeper.fileProvider", file);
-                TODO: Implement FileProvider for Android 8+
-                }*/
+                    Uri data = FileProvider.getUriForFile(context, "com.example.memokeeper.FileProvider", file);
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
+                    intent.setDataAndType(data, mimeType);
+                    PackageManager pm = context.getPackageManager();
+                    if (intent.resolveActivity(pm) != null) {
+                        context.startActivity(intent);
+                    }
+                }
             }
         });
 
+    }
+
+    public ArrayList<String> returnFilePath() {
+        return pathList;
+    }
+
+    public void getNewFilePath(ArrayList<String> filePath) {
+        pathList = filePath;
     }
 }
