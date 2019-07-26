@@ -17,7 +17,10 @@ import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(mainScreenToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
+        registerForContextMenu(memoList);
     }
 
     @Override
@@ -60,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        Intent intent;
         switch (item.getItemId()){
             case R.id.action_add_memo:
                 Intent INTENT = new Intent(context, MemoEditActivity.class);
@@ -69,6 +72,29 @@ public class MainActivity extends AppCompatActivity {
 
             default:
                 return false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int RequestCode, int ResultCode, Intent data) {
+        if (RequestCode == REQUEST_CODE.MEMO_EDIT && ResultCode == RESULT_OK) {
+            if(data.getIntExtra("listPosition", -1) == -1) {
+                String memoTitle = data.getStringExtra("memoTitle");
+                String memoContent = data.getStringExtra("memoContent");
+                Date today = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                memo.add(new MemoInfo(memoTitle, dateFormat.format(today), memoContent));
+                memoAdapter.notifyItemInserted(memo.size() - 1);
+            }
+            else {
+                int pos = data.getIntExtra("listPosition", -1);
+                String memoTitle = data.getStringExtra("memoTitle");
+                String memoContent = data.getStringExtra("memoContent");
+                Date today = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                memo.set(pos, new MemoInfo(memoTitle, dateFormat.format(today), memoContent));
+                memoAdapter.notifyItemChanged(pos);
+            }
         }
     }
 

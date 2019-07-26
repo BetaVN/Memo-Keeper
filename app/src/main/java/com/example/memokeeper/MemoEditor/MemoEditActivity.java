@@ -39,6 +39,7 @@ public class MemoEditActivity extends AppCompatActivity {
     private MenuInflater inflater;
     private String memoContent;
     private String memoTitle;
+    private int listPos;
     private EditText textField;
     private EditText titleField;
     private RecyclerView attachedItems;
@@ -99,8 +100,7 @@ public class MemoEditActivity extends AppCompatActivity {
         Intent intent = getIntent();
         titleField.setText(intent.getStringExtra("memoTitle"));
         textField.setText(intent.getStringExtra("memoText"));
-
-
+        listPos = intent.getIntExtra("listPosition", -1);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class MemoEditActivity extends AppCompatActivity {
 
             case R.id.action_add_file:
                 intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
+                intent.setType("*/*");
                 startActivityForResult(intent, REQUEST_CODE.MEMO_PICK_FILE);
                 return true;
 
@@ -149,9 +149,8 @@ public class MemoEditActivity extends AppCompatActivity {
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {
-                        filePath = context.getFilesDir().getAbsolutePath() + newFile.getName();
+                        filePath = context.getFilesDir() + "/" + newFile.getName();
                     }
-                    Log.d("Path", filePath);
                     newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), false, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
@@ -165,9 +164,8 @@ public class MemoEditActivity extends AppCompatActivity {
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {
-                        filePath = context.getFilesDir().getAbsolutePath() + newFile.getName();
+                        filePath = context.getFilesDir() + "/" + newFile.getName();
                     }
-                    Log.d("Path", filePath);
                     newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), true, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
@@ -212,11 +210,14 @@ public class MemoEditActivity extends AppCompatActivity {
     private Boolean addNewFilesLocal(File newFile) {
         try {
             FileInputStream inputStream = new FileInputStream(newFile);
-            byte[] b = new byte[(int) newFile.length()];
-            inputStream.read(b);
+            File target = new File(context.getFilesDir(), newFile.getName());
+            FileOutputStream outputStream = new FileOutputStream(target);
+            byte[] b = new byte[1024];
+            int len;
+            while ((len = inputStream.read(b)) > 0) {
+                outputStream.write(b, 0, len);
+            }
             inputStream.close();
-            FileOutputStream outputStream = new FileOutputStream(newFile);
-            outputStream.write(b);
             outputStream.close();
             return true;
         } catch (FileNotFoundException e) {
@@ -238,6 +239,12 @@ public class MemoEditActivity extends AppCompatActivity {
     }
 
     private void exitActivity() {
+        Intent memoReturn = new Intent();
+        memoReturn.putExtra("memoContent", memoContent);
+        memoReturn.putExtra("memoTitle", memoTitle);
+        memoReturn.putExtra("attachedFile", attachedFilePath);
+        memoReturn.putExtra("listPosition", listPos);
+        setResult(RESULT_OK, memoReturn);
         super.finish();
     }
 }
