@@ -178,7 +178,6 @@ public class MemoEditActivity extends AppCompatActivity {
         memoContent = textField.getText().toString();
         memoTitle = titleField.getText().toString();
         Toast.makeText(MemoEditActivity.this, "Memo saved successfully", Toast.LENGTH_SHORT).show();
-        //TODO: Save to database, show failed toast if can't save
     }
 
     private void exitMemo() {
