@@ -2,6 +2,8 @@ package com.example.memokeeper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,14 +19,16 @@ import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
+import com.example.memokeeper.Utilities.DateUtils;
+import com.example.memokeeper.Utilities.PathUtils;
 
-import java.text.SimpleDateFormat;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     final private Context context = this;
 
@@ -32,19 +36,20 @@ public class MainActivity extends AppCompatActivity {
     private MemoAdapter memoAdapter;
     private ArrayList<MemoInfo> memo;
     private RecyclerView memoList;
+    private MemoAsync memoGrabber = new MemoAsync();
+    private String currentUnusedHash;
+    private boolean newMemoCreated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         Toolbar mainScreenToolbar = findViewById(R.id.mainScreenToolbar);
         memoList = findViewById(R.id.memoList);
         memo = new ArrayList<>();
-
-        memo.add(new MemoInfo("This is a sample memo", "18/7/2019", "Please remember to feed the dog.\nAnd also pick up Carl from school"));
-        memo.add(new MemoInfo("This is another sample memo", "19/7/2018", "Vacation day. Things to do:\n\nBuy food\nBuy sunscreen\nBuy swimsuits"));
-
+        memoGrabber.execute("");
 
         memoAdapter = new MemoAdapter(memo, context);
         memoList.setAdapter(memoAdapter);
@@ -68,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.action_add_memo:
                 Intent INTENT = new Intent(context, MemoEditActivity.class);
+                currentUnusedHash = PathUtils.generateFolderHash(8);
+                newMemoCreated = true;
+                INTENT.putExtra("listPosition", -1);
+                INTENT.putExtra("hashFolder", currentUnusedHash);
                 startActivityForResult(INTENT, REQUEST_CODE.MEMO_EDIT);
                 return true;
 
@@ -78,25 +87,64 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int RequestCode, int ResultCode, Intent data) {
-        if (RequestCode == REQUEST_CODE.MEMO_EDIT && ResultCode == RESULT_OK) {
-            int pos = data.getIntExtra("listPosition", -1);
-            String memoTitle = data.getStringExtra("memoTitle");
-            String memoContent = data.getStringExtra("memoContent");
-            Date today = Calendar.getInstance().getTime();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            MemoInfo newMemo = new MemoInfo(memoTitle, dateFormat.format(today), memoContent);
-            if(pos == -1) {
-                memo.add(newMemo);
-                memoAdapter.notifyItemInserted(memo.size() - 1);
-                MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
-                dbHelper.addNewMemo(newMemo);
+        if (RequestCode == REQUEST_CODE.MEMO_EDIT) {
+            if (ResultCode == RESULT_OK) {
+                int pos = data.getIntExtra("listPosition", -1);
+                String hash = data.getStringExtra("hashFolder");
+                String memoTitle = data.getStringExtra("memoTitle");
+                String memoContent = data.getStringExtra("memoContent");
+                Date today = Calendar.getInstance().getTime();
+                String memoAttachment = data.getStringExtra("memoAttachment");
+                MemoInfo newMemo = new MemoInfo(memoTitle, DateUtils.dateToComparableInt(today), memoContent, memoAttachment, hash);
+                if (pos == -1) {
+                    memo.add(newMemo);
+                    memoAdapter.notifyItemInserted(memo.size() - 1);
+                    MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
+                    long newID = dbHelper.addNewMemo(newMemo);
+                    PathUtils.renameMemoFolder(getFilesDir().getAbsolutePath(), newID);
+                } else {
+                    memo.set(pos, newMemo);
+                    memoAdapter.notifyItemChanged(pos);
+
+                }
             }
             else {
-                memo.set(pos, newMemo);
-                memoAdapter.notifyItemChanged(pos);
-
+                if (newMemoCreated) {
+                    File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
+                    deleteFolder.delete();
+                    newMemoCreated = false;
+                }
             }
         }
     }
 
+    private void updateView(ArrayList<MemoInfo> result) {
+        if (memo.addAll(result)) {
+            memoAdapter.notifyItemInserted(memo.size() - 1);
+        }
+    }
+
+    private class MemoAsync extends AsyncTask<String, Void, ArrayList<MemoInfo>> {
+        @Override
+        protected ArrayList<MemoInfo> doInBackground(String... url) {
+            MemoContract.MemoDbHelper fetchMemo = new MemoContract().new MemoDbHelper(context);
+            Cursor allMemo = fetchMemo.getAllMemo();
+            ArrayList<MemoInfo> memoList = new ArrayList<>();
+            if (allMemo.moveToFirst()) {
+                do {
+                    String memoTitle = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_TITLE));
+                    String memoContent = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_CONTENT));
+                    String memoAttachment = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_ATTACHMENT));
+                    int date = allMemo.getInt(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_DATE));
+                    String hash = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
+                    memoList.add(new MemoInfo(memoTitle, date, memoContent, memoAttachment, hash));
+                } while (allMemo.moveToNext());
+            }
+            return memoList;
+        }
+
+        protected void onPostExecute(ArrayList<MemoInfo> result) {
+            updateView(result);
+        }
+    }
 }

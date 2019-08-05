@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +43,6 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
 
     private ArrayList<AttachedItem> itemList;
     private Context context;
-    private ArrayList<String> pathList = new ArrayList<>();
 
     public AttachItemAdapter(ArrayList<AttachedItem> items, Context context){
         itemList = items;
@@ -84,6 +84,8 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
                 confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        File deleteFile = new File(newItem.filePath);
+                        deleteFile.delete();
                         itemList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, itemList.size());
@@ -131,14 +133,16 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
                 }
             }
         });
-
     }
 
-    public ArrayList<String> returnFilePath() {
-        return pathList;
-    }
-
-    public void getNewFilePath(ArrayList<String> filePath) {
-        pathList = filePath;
+    public String returnFilePath() {
+        ArrayList<String> result = new ArrayList<>();
+        if (itemList.size() == 0) {
+            return "";
+        }
+        for (AttachedItem item: itemList) {
+            result.add(item.filePath);
+        }
+        return TextUtils.join("::", result);
     }
 }

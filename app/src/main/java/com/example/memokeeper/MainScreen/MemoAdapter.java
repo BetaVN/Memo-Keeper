@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,9 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.memokeeper.Constants.REQUEST_CODE;
+import com.example.memokeeper.DatabaseHelper.MemoContract;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
 import com.example.memokeeper.R;
+import com.example.memokeeper.Utilities.DateUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
@@ -59,6 +63,13 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
                 confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        MemoContract.MemoDbHelper deleteMemo = new MemoContract().new MemoDbHelper(context);
+                        deleteMemo.deleteMemo(memoList.get(position).hash);
+                        File deleteFolder = new File(context.getFilesDir().getAbsolutePath(), memoList.get(position).hash);
+                        if (deleteFolder.exists()) {
+                            Log.d("Delete", "Found");
+                            deleteFolder.delete();
+                        }
                         memoList.remove(position);
                         notifyItemRemoved(position);
                         notifyItemRangeChanged(position, memoList.size());
@@ -108,7 +119,7 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
         final MemoInfo newMemo = memoList.get(position);
         memoHolder.position = position;
         memoHolder.title.setText(newMemo.memoTitle);
-        memoHolder.date.setText(newMemo.memoDate);
+        memoHolder.date.setText(DateUtils.intToString(newMemo.memoDate));
 
         memoHolder.memoItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +127,8 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
                 Intent INTENT = new Intent(context, MemoEditActivity.class);
                 INTENT.putExtra("memoTitle", newMemo.memoTitle);
                 INTENT.putExtra("memoText", newMemo.memoText);
+                INTENT.putExtra("memoAttachment", newMemo.memoAttachment);
+                INTENT.putExtra("hashFolder", newMemo.hash);
                 INTENT.putExtra("listPosition", position);
                 ((Activity) context).startActivityForResult(INTENT, REQUEST_CODE.MEMO_EDIT);
             }

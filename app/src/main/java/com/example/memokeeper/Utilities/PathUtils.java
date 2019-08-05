@@ -9,6 +9,9 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import java.io.File;
+import java.util.Random;
+
 public class PathUtils {
 
     public static String getPath(final Context context, final Uri uri) {
@@ -141,5 +144,26 @@ public class PathUtils {
             return ext.toLowerCase();
 
         }
+    }
+
+    public static void renameMemoFolder(final String dir, final long input) {
+        File target = new File(dir, "cache");
+        File output = new File(dir, String.valueOf(input));
+        if (target.exists()) {
+            target.renameTo(output);
+        }
+    }
+
+    public static String generateFolderHash(int input) {
+        String DATA = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random RANDOM = new Random();
+
+        StringBuilder sb = new StringBuilder(input);
+
+        for (int i = 0; i < input; i++) {
+            sb.append(DATA.charAt(RANDOM.nextInt(DATA.length())));
+        }
+
+        return sb.toString();
     }
 }

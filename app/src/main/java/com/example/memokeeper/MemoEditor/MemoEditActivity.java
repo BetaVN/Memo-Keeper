@@ -14,10 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MemoEditActivity extends AppCompatActivity {
     final private Context context = this;
@@ -39,6 +42,8 @@ public class MemoEditActivity extends AppCompatActivity {
     private MenuInflater inflater;
     private String memoContent;
     private String memoTitle;
+    private String folder;
+    private String hash;
     private int listPos;
     private EditText textField;
     private EditText titleField;
@@ -79,28 +84,44 @@ public class MemoEditActivity extends AppCompatActivity {
 
             }
         }
-
+        Intent intent = getIntent();
         Toolbar editToolbar = findViewById(R.id.memoEditBar);
         titleField = findViewById(R.id.titleEditText);
         textField = findViewById(R.id.memoEditText);
         attachedItems = findViewById(R.id.attachedItemList);
         items = new ArrayList<>();
         newFilePath = new ArrayList<>();
-        attachedFilePath = new ArrayList<>();
-
+        String memoAttachment = intent.getStringExtra("memoAttachment");
+        if (memoAttachment != null) {
+            attachedFilePath = new ArrayList<>(Arrays.asList(memoAttachment.split("::")));
+        }
+        else {
+            attachedFilePath = new ArrayList<>();
+        }
+        importExistingAttachment();
         attachItemAdapter = new AttachItemAdapter(items, context);
         attachedItems.setAdapter(attachItemAdapter);
         attachedItems.setLayoutManager(new LinearLayoutManager(this));
 
-        syncFilePath();
-
         setSupportActionBar(editToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
 
-        Intent intent = getIntent();
+
         titleField.setText(intent.getStringExtra("memoTitle"));
         textField.setText(intent.getStringExtra("memoText"));
+        hash = intent.getStringExtra("hashFolder");
         listPos = intent.getIntExtra("listPosition", -1);
+        if (hash != null) {
+            folder = hash;
+        }
+        else {
+            hash = PathUtils.generateFolderHash(8);
+            folder = hash;
+        }
+        File attachFolder = new File(getFilesDir(), folder);
+        if (attachFolder.exists() == false) {
+            attachFolder.mkdir();
+        }
     }
 
     @Override
@@ -149,13 +170,14 @@ public class MemoEditActivity extends AppCompatActivity {
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {
-                        filePath = context.getFilesDir() + "/" + newFile.getName();
+                        filePath = context.getFilesDir() + "/" + folder + "/" + newFile.getName();
                     }
                     newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), false, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
-                    syncFilePath();
+
                 }
+                return;
 
             case REQUEST_CODE.MEMO_PICK_IMAGE:
                 if(resultCode==RESULT_OK){
@@ -164,20 +186,25 @@ public class MemoEditActivity extends AppCompatActivity {
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {
-                        filePath = context.getFilesDir() + "/" + newFile.getName();
+                        filePath = context.getFilesDir() + "/" + folder + "/" + newFile.getName();
                     }
                     newFilePath.add(filePath);
                     items.add(new AttachedItem(newFile.getName(), true, filePath));
                     attachItemAdapter.notifyItemInserted(items.size() - 1);
-                    syncFilePath();
                 }
+                return;
         }
     }
 
-    public void saveMemo() {
+    public boolean saveMemo() {
         memoContent = textField.getText().toString();
         memoTitle = titleField.getText().toString();
-        Toast.makeText(MemoEditActivity.this, "Memo saved successfully", Toast.LENGTH_SHORT).show();
+        if (memoTitle.matches(".*[a-zA-z].*")) {
+            Toast.makeText(MemoEditActivity.this, "Memo saved successfully", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        Toast.makeText(MemoEditActivity.this, "Memo title cannot be empty. Please try again.", Toast.LENGTH_SHORT).show();
+        return false;
     }
 
     private void exitMemo() {
@@ -187,8 +214,9 @@ public class MemoEditActivity extends AppCompatActivity {
         confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                saveMemo();
-                exitActivity();
+                if (saveMemo()) {
+                    exitActivity();
+                }
             }
         });
         confirmDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -209,7 +237,8 @@ public class MemoEditActivity extends AppCompatActivity {
     private Boolean addNewFilesLocal(File newFile) {
         try {
             FileInputStream inputStream = new FileInputStream(newFile);
-            File target = new File(context.getFilesDir(), newFile.getName());
+            File target = new File(context.getFilesDir() + "/" + folder + "/", newFile.getName());
+            Log.d("Output loc", target.getAbsolutePath() + "");
             FileOutputStream outputStream = new FileOutputStream(target);
             byte[] b = new byte[1024];
             int len;
@@ -228,22 +257,36 @@ public class MemoEditActivity extends AppCompatActivity {
         return false;
     }
 
-    private void syncFilePath() {
-        ArrayList<String> syncedList = attachItemAdapter.returnFilePath();
-        if (syncedList.addAll(newFilePath)) {
-            attachedFilePath = syncedList;
-            attachItemAdapter.getNewFilePath(syncedList);
+    private void importExistingAttachment() {
+        if (attachedFilePath.size() > 0) {
+            boolean isImage;
+            for (String path: attachedFilePath) {
+                File attachment = new File(path);
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                String mimeType = myMime.getMimeTypeFromExtension(attachment.getPath().substring(attachment.getPath().lastIndexOf(".") + 1));
+                Log.d("Debug", mimeType + "");
+                isImage = false;
+                if (mimeType.contains("image")) {
+                    isImage = true;
+                }
+                items.add(new AttachedItem(attachment.getName(), isImage, attachment.getAbsolutePath()));
+            }
         }
-        newFilePath.clear();
     }
 
     private void exitActivity() {
         Intent memoReturn = new Intent();
-        memoReturn.putExtra("memoContent", memoContent);
-        memoReturn.putExtra("memoTitle", memoTitle);
-        memoReturn.putExtra("attachedFile", attachedFilePath);
-        memoReturn.putExtra("listPosition", listPos);
-        setResult(RESULT_OK, memoReturn);
+        if (memoTitle.matches(".*[a-zA-z].*")) {
+            memoReturn.putExtra("memoContent", memoContent);
+            memoReturn.putExtra("memoTitle", memoTitle);
+            memoReturn.putExtra("memoAttachment", attachItemAdapter.returnFilePath());
+            memoReturn.putExtra("hashFolder", hash);
+            memoReturn.putExtra("listPosition", listPos);
+            setResult(RESULT_OK, memoReturn);
+        }
+        else {
+            setResult(RESULT_CANCELED,memoReturn);
+        }
         super.finish();
     }
 }
