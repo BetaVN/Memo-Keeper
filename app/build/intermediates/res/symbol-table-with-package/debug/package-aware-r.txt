@@ -1001,6 +1001,7 @@ drawable design_ic_visibility
 drawable design_ic_visibility_off
 drawable design_password_eye
 drawable design_snackbar_background
+drawable ic_add
 drawable ic_attach_file
 drawable ic_attach_photos
 drawable ic_back
@@ -1027,6 +1028,7 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable round_corners_blank
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
 id ALT
@@ -1036,6 +1038,7 @@ id META
 id SHIFT
 id SYM
 id action_add_file
+id action_add_memo
 id action_add_photos
 id action_bar
 id action_bar_activity_content
@@ -1069,7 +1072,6 @@ id barrier
 id beginning
 id blocking
 id bottom
-id button
 id buttonPanel
 id center
 id center_horizontal
@@ -1087,6 +1089,7 @@ id contentPanel
 id coordinator
 id custom
 id customPanel
+id date
 id decor_content_parent
 id default_activity_button
 id design_bottom_sheet
@@ -1097,6 +1100,7 @@ id design_navigation_view
 id dimensions
 id direct
 id disableHome
+id divider
 id edit_query
 id end
 id enterAlways
@@ -1125,6 +1129,7 @@ id image
 id info
 id invisible
 id italic
+id item_memo
 id item_touch_helper_previous_elevation
 id labeled
 id largeLabel
@@ -1133,9 +1138,11 @@ id line1
 id line3
 id listMode
 id list_item
+id mainScreenToolbar
 id masked
 id memoEditBar
 id memoEditText
+id memoList
 id message
 id middle
 id mini
@@ -1223,6 +1230,7 @@ id time
 id title
 id titleDividerNoCustom
 id titleEditText
+id titleName
 id title_template
 id top
 id topPanel
@@ -1305,6 +1313,7 @@ layout design_navigation_menu
 layout design_navigation_menu_item
 layout design_text_input_password_icon
 layout item_attached_item
+layout item_memo
 layout mtrl_layout_snackbar
 layout mtrl_layout_snackbar_include
 layout notification_action
@@ -1317,6 +1326,7 @@ layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
 layout support_simple_spinner_dropdown_item
+menu menu_base
 menu menu_memo_edit
 mipmap ic_launcher
 mipmap ic_launcher_round
