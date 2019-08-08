@@ -146,16 +146,8 @@ public class PathUtils {
         }
     }
 
-    public static void renameMemoFolder(final String dir, final long input) {
-        File target = new File(dir, "cache");
-        File output = new File(dir, String.valueOf(input));
-        if (target.exists()) {
-            target.renameTo(output);
-        }
-    }
-
     public static String generateFolderHash(int input) {
-        String DATA = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String DATA = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         Random RANDOM = new Random();
 
         StringBuilder sb = new StringBuilder(input);

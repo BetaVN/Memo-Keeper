@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,6 +63,18 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (newMemoCreated) {
+            File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
+            deleteFolder.delete();
+            newMemoCreated = false;
+            Log.d("Destroy", "Temporary folder " + currentUnusedHash + " deleted!");
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_base, menu);
@@ -73,7 +86,9 @@ public class MainActivity extends AppCompatActivity{
         switch (item.getItemId()){
             case R.id.action_add_memo:
                 Intent INTENT = new Intent(context, MemoEditActivity.class);
-                currentUnusedHash = PathUtils.generateFolderHash(8);
+                do {
+                    currentUnusedHash = PathUtils.generateFolderHash(8);
+                } while(new File(getFilesDir().getAbsolutePath(), String.valueOf(currentUnusedHash)).exists() == true);
                 newMemoCreated = true;
                 INTENT.putExtra("listPosition", -1);
                 INTENT.putExtra("hashFolder", currentUnusedHash);
@@ -100,11 +115,12 @@ public class MainActivity extends AppCompatActivity{
                     memo.add(newMemo);
                     memoAdapter.notifyItemInserted(memo.size() - 1);
                     MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
-                    long newID = dbHelper.addNewMemo(newMemo);
-                    PathUtils.renameMemoFolder(getFilesDir().getAbsolutePath(), newID);
+                    dbHelper.addNewMemo(newMemo);
                 } else {
                     memo.set(pos, newMemo);
                     memoAdapter.notifyItemChanged(pos);
+                    MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
+                    dbHelper.updateMemo(newMemo);
 
                 }
             }
