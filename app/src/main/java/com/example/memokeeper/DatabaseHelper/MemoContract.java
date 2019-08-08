@@ -57,7 +57,7 @@ public final class MemoContract {
             onCreate(db);
         }
 
-        public long addNewMemo(MemoInfo newMemo) {
+        public void addNewMemo(MemoInfo newMemo) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues memo = new ContentValues();
             memo.put(MemoEntry.COLLUMN_MEMO_TITLE, newMemo.memoTitle);
@@ -66,14 +66,12 @@ public final class MemoContract {
             memo.put(MemoEntry.COLLUMN_MEMO_DATE, newMemo.memoDate);
             memo.put(MemoEntry.COLLUMN_MEMO_HASH, newMemo.hash);
 
-            long result = db.insert(MemoEntry.TABLE_NAME, null, memo);
-            if (result == -1) {
-                Log.d("Database", "Memo added");
+            if (db.insert(MemoEntry.TABLE_NAME, null, memo) > -1) {
+                Log.d("Database", "Memo added successfully!");
             }
             else {
-                Log.d("Database", "Failed to add memo");
+                Log.d("Database", "Failed to add memo!");
             }
-            return result;
         }
 
         public Cursor getAllMemo() {
@@ -85,7 +83,27 @@ public final class MemoContract {
 
         public void deleteMemo(String hash) {
             SQLiteDatabase db = this.getWritableDatabase();
-            db.delete(MemoEntry.TABLE_NAME, MemoEntry.COLLUMN_MEMO_HASH + " = ?", new String[]{hash});
+            if (db.delete(MemoEntry.TABLE_NAME, MemoEntry.COLLUMN_MEMO_HASH + " = ?", new String[]{hash}) > -1) {
+                Log.d("Database", "Memo deleted successfully!");
+            }
+            else {
+                Log.d("Database", "Can't find memo to delete!");
+            }
+        }
+
+        public void updateMemo(MemoInfo updatedMemo) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues memo = new ContentValues();
+            memo.put(MemoEntry.COLLUMN_MEMO_TITLE, updatedMemo.memoTitle);
+            memo.put(MemoEntry.COLLUMN_MEMO_CONTENT, updatedMemo.memoText);
+            memo.put(MemoEntry.COLLUMN_MEMO_ATTACHMENT, updatedMemo.memoAttachment);
+            memo.put(MemoEntry.COLLUMN_MEMO_DATE, updatedMemo.memoDate);
+            if (db.update(MemoEntry.TABLE_NAME, memo, MemoEntry.COLLUMN_MEMO_HASH + " = ?", new String[]{updatedMemo.hash}) > -1) {
+                Log.d("Database", "Memo updated successfully!");
+            }
+            else {
+                Log.d("Database", "Failed to update memo!");
+            }
         }
     }
 }
