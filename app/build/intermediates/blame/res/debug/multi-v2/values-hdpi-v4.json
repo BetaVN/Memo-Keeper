@@ -4,7 +4,7 @@
             "outputFile": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-hdpi-v4/values-hdpi-v4.xml",
             "map": [
                 {
-                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/7c4bc75ef92929cf572f6c996c2a6745/res/values-hdpi-v4/values-hdpi-v4.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

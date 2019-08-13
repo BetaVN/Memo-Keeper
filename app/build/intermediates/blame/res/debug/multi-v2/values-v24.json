@@ -4,13 +4,30 @@
             "outputFile": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v24/values-v24.xml",
             "map": [
                 {
-                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/values-v24/values-v24.xml",
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/7c4bc75ef92929cf572f6c996c2a6745/res/values-v24/values-v24.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
                         "startOffsets": "55,212",
                         "endColumns": "156,134",
                         "endOffsets": "207,342"
+                    }
+                },
+                {
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/77413cdae73b42788c7614f7ef7f45c6/res/values-v24/values-v24.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,121,182,248",
+                        "endColumns": "65,60,65,66",
+                        "endOffsets": "116,177,243,310"
+                    },
+                    "to": {
+                        "startLines": "4,5,6,7",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "347,413,474,540",
+                        "endColumns": "65,60,65,66",
+                        "endOffsets": "408,469,535,602"
                     }
                 }
             ]

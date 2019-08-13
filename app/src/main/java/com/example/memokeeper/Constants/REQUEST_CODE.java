@@ -5,5 +5,7 @@ public class REQUEST_CODE {
     public static final int MEMO_PICK_FILE = 10001;
     public static final int MEMO_PICK_IMAGE = 10002;
 
+    public static final int GOOGLE_SIGN_IN = 10003;
+
 
 }

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:title="Google Sign In"
+        android:id="@+id/action_google_signin"
+        android:icon="@drawable/ic_profile"
+        app:showAsAction="ifRoom"/>
+    <item
         android:title="Add Files"
         android:id="@+id/action_add_memo"
         android:icon="@drawable/ic_add"

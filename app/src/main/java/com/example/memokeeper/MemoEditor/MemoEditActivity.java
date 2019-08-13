@@ -7,14 +7,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -106,9 +106,11 @@ public class MemoEditActivity extends AppCompatActivity {
         setSupportActionBar(editToolbar);
         getSupportActionBar().setTitle("Memo Keeper");
 
+        memoTitle = intent.getStringExtra("memoTitle");
+        memoContent = intent.getStringExtra("memoText");
 
-        titleField.setText(intent.getStringExtra("memoTitle"));
-        textField.setText(intent.getStringExtra("memoText"));
+        titleField.setText(memoTitle);
+        textField.setText(memoContent);
         hash = intent.getStringExtra("hashFolder");
         listPos = intent.getIntExtra("listPosition", -1);
         if (hash != null) {
@@ -199,7 +201,7 @@ public class MemoEditActivity extends AppCompatActivity {
     public boolean saveMemo() {
         memoContent = textField.getText().toString();
         memoTitle = titleField.getText().toString();
-        if (memoTitle.matches(".*[a-zA-z].*")) {
+        if ((memoTitle != null) && (memoTitle.matches(".*[a-zA-z].*"))) {
             Toast.makeText(MemoEditActivity.this, "Memo saved successfully", Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -276,7 +278,7 @@ public class MemoEditActivity extends AppCompatActivity {
 
     private void exitActivity() {
         Intent memoReturn = new Intent();
-        if (memoTitle.matches(".*[a-zA-z].*")) {
+        if ((memoTitle != null) && (memoTitle.matches(".*[a-zA-z].*"))) {
             memoReturn.putExtra("memoContent", memoContent);
             memoReturn.putExtra("memoTitle", memoTitle);
             memoReturn.putExtra("memoAttachment", attachItemAdapter.returnFilePath());

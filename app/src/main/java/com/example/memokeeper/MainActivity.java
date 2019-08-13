@@ -4,15 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
@@ -20,6 +20,7 @@ import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
+import com.example.memokeeper.ProfilePage.SignInActivity;
 import com.example.memokeeper.Utilities.DateUtils;
 import com.example.memokeeper.Utilities.PathUtils;
 
@@ -95,6 +96,11 @@ public class MainActivity extends AppCompatActivity{
                 startActivityForResult(INTENT, REQUEST_CODE.MEMO_EDIT);
                 return true;
 
+            case R.id.action_google_signin:
+                Intent PROFILE = new Intent(context, SignInActivity.class);
+                startActivity(PROFILE);
+                return true;
+
             default:
                 return false;
         }
@@ -124,7 +130,7 @@ public class MainActivity extends AppCompatActivity{
 
                 }
             }
-            else {
+            else if (ResultCode == RESULT_CANCELED) {
                 if (newMemoCreated) {
                     File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
                     deleteFolder.delete();

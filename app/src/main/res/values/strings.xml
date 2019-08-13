@@ -5,4 +5,5 @@
     <string name="memo_title">Title</string>
     <string name="memo_text">Type your memo here</string>
     <string name="title_activity_memo_attachment">MemoAttachmentActivity</string>
+    <string name="sign_in_line">Please select a sign in method below</string>
 </resources>

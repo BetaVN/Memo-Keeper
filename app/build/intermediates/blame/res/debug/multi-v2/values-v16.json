@@ -4,7 +4,7 @@
             "outputFile": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/5b2dd487a02299e4d97e0e3d6b099d2e/res/values-v16/values-v16.xml",
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/e32415a40a559beaffffc36ebe044559/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -14,7 +14,7 @@
                     }
                 },
                 {
-                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/values-v16/values-v16.xml",
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/7c4bc75ef92929cf572f6c996c2a6745/res/values-v16/values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

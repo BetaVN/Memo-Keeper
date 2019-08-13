@@ -4,7 +4,24 @@
             "outputFile": "/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
-                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/deda2a26fc2fb3ed130c3850343ae355/res/values-watch-v20/values-watch-v20.xml",
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/res/values-watch-v20/values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11",
+                        "startColumns": "0,0,0,0,0,0,0,0",
+                        "startOffsets": "171,246,322,397,472,559,636,723",
+                        "endColumns": "74,75,74,74,86,76,86,75",
+                        "endOffsets": "245,321,396,471,558,635,722,798"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,134,214,293,372,463,544,635",
+                        "endColumns": "78,79,78,78,90,80,90,79",
+                        "endOffsets": "129,209,288,367,458,539,630,710"
+                    }
+                },
+                {
+                    "source": "/home/cpu10856/.gradle/caches/transforms-2/files-2.1/7c4bc75ef92929cf572f6c996c2a6745/res/values-watch-v20/values-watch-v20.xml",
                     "from": {
                         "startLines": "2,5,8",
                         "startColumns": "4,4,4",
@@ -12,6 +29,14 @@
                         "endLines": "4,7,10",
                         "endColumns": "12,12,12",
                         "endOffsets": "209,380,553"
+                    },
+                    "to": {
+                        "startLines": "10,13,16",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "715,874,1045",
+                        "endLines": "12,15,18",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "869,1040,1213"
                     }
                 }
             ]
