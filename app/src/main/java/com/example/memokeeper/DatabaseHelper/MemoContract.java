@@ -77,7 +77,7 @@ public final class MemoContract {
         public Cursor getAllMemo() {
             SQLiteDatabase db = this.getReadableDatabase();
             String[] projection = { MemoEntry.COLLUMN_MEMO_TITLE, MemoEntry.COLLUMN_MEMO_CONTENT, MemoEntry.COLLUMN_MEMO_ATTACHMENT, MemoEntry.COLLUMN_MEMO_DATE, MemoEntry.COLLUMN_MEMO_HASH};
-            Cursor result = db.query( MemoEntry.TABLE_NAME, projection, "0=0", null, null, null, MemoEntry._ID + " DESC");
+            Cursor result = db.query( MemoEntry.TABLE_NAME, projection, "0=0", null, null, null, MemoEntry.COLLUMN_MEMO_DATE + " DESC");
             return result;
         }
 

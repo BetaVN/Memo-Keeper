@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Toast;
 
@@ -25,6 +27,7 @@ public class SignInActivity extends AppCompatActivity {
     private SignInButton googleSignIn;
     private GoogleSignInAccount user = null;
     private Context context = this;
+    private MenuInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +62,29 @@ public class SignInActivity extends AppCompatActivity {
                 try {
                     Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                     user = task.getResult(ApiException.class);
-                    Toast.makeText(context, "Google account logged in successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Google account signed in successfully", Toast.LENGTH_SHORT).show();
+                    exitActivity();
                 } catch (ApiException e) {
+                    Toast.makeText(context, "Failed to sign in", Toast.LENGTH_SHORT).show();
                     Log.d("Sign in failed", "signInResult:failed code=" + e.getStatusCode());
                 }
             }
         }
     }
 
-    private void exitActivity() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_empty, menu);
+        return true;
+    }
 
+    private void exitActivity() {
+        Intent signInReturn = new Intent();
+        if (user != null) {
+            signInReturn.putExtra("account", user);
+            setResult(RESULT_OK, signInReturn);
+            super.finish();
+        }
     }
 }

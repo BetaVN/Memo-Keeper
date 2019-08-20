@@ -36,6 +36,9 @@
         <activity
             android:name="com.example.memokeeper.MemoEditor.MemoEditActivity"
             android:label="MemoEditActivity" />
+        <activity
+            android:name="com.example.memokeeper.ProfilePage.ProfilePageActivity"
+            android:label="ProfilePageActivity" />
         <activity android:name="com.example.memokeeper.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

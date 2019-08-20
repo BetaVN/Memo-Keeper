@@ -20,9 +20,11 @@ import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
+import com.example.memokeeper.ProfilePage.ProfilePageActivity;
 import com.example.memokeeper.ProfilePage.SignInActivity;
 import com.example.memokeeper.Utilities.DateUtils;
 import com.example.memokeeper.Utilities.PathUtils;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity{
 
     final private Context context = this;
 
+    private GoogleSignInAccount user = null;
+
     private MenuInflater inflater;
     private MemoAdapter memoAdapter;
     private ArrayList<MemoInfo> memo;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity{
     private MemoAsync memoGrabber = new MemoAsync();
     private String currentUnusedHash;
     private boolean newMemoCreated = false;
+    private MemoContract.MemoDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity{
 
 
         Toolbar mainScreenToolbar = findViewById(R.id.mainScreenToolbar);
+        dbHelper = new MemoContract().new MemoDbHelper(context);
         memoList = findViewById(R.id.memoList);
         memo = new ArrayList<>();
         memoGrabber.execute("");
@@ -66,11 +72,12 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        dbHelper.close();
         if (newMemoCreated) {
             File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
             deleteFolder.delete();
             newMemoCreated = false;
-            Log.d("Destroy", "Temporary folder " + currentUnusedHash + " deleted!");
+            Log.d("Destroy temp folder", "Temporary folder " + currentUnusedHash + " deleted!");
         }
 
     }
@@ -97,8 +104,15 @@ public class MainActivity extends AppCompatActivity{
                 return true;
 
             case R.id.action_google_signin:
-                Intent PROFILE = new Intent(context, SignInActivity.class);
-                startActivity(PROFILE);
+                if (isSignedIn()) {
+                    Intent PROFILE = new Intent(context, ProfilePageActivity.class);
+                    PROFILE.putExtra("user", user);
+                    startActivityForResult(PROFILE, REQUEST_CODE.VIEW_PROFILE);
+                }
+                else {
+                    Intent PROFILE = new Intent(context, SignInActivity.class);
+                    startActivityForResult(PROFILE, REQUEST_CODE.SIGN_IN);
+                }
                 return true;
 
             default:
@@ -120,12 +134,10 @@ public class MainActivity extends AppCompatActivity{
                 if (pos == -1) {
                     memo.add(newMemo);
                     memoAdapter.notifyItemInserted(memo.size() - 1);
-                    MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
                     dbHelper.addNewMemo(newMemo);
                 } else {
                     memo.set(pos, newMemo);
                     memoAdapter.notifyItemChanged(pos);
-                    MemoContract.MemoDbHelper dbHelper = new MemoContract().new MemoDbHelper(context);
                     dbHelper.updateMemo(newMemo);
 
                 }
@@ -135,6 +147,23 @@ public class MainActivity extends AppCompatActivity{
                     File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
                     deleteFolder.delete();
                     newMemoCreated = false;
+                }
+            }
+        }
+        if (RequestCode == REQUEST_CODE.SIGN_IN) {
+            if (ResultCode == RESULT_OK) {
+                user = data.getParcelableExtra("account");
+                Log.d("Account", user.getEmail() + "");
+                Log.d("Account", user.getDisplayName() + "");
+                Log.d("Account", user.getGivenName() + "");
+                Log.d("Account", user.getId() + "");
+            }
+        }
+        if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
+            if (ResultCode == RESULT_OK) {
+                Intent signOut = getIntent();
+                if (signOut.getBooleanExtra("Sign out", false)) {
+                    user = null;
                 }
             }
         }
@@ -149,8 +178,7 @@ public class MainActivity extends AppCompatActivity{
     private class MemoAsync extends AsyncTask<String, Void, ArrayList<MemoInfo>> {
         @Override
         protected ArrayList<MemoInfo> doInBackground(String... url) {
-            MemoContract.MemoDbHelper fetchMemo = new MemoContract().new MemoDbHelper(context);
-            Cursor allMemo = fetchMemo.getAllMemo();
+            Cursor allMemo = dbHelper.getAllMemo();
             ArrayList<MemoInfo> memoList = new ArrayList<>();
             if (allMemo.moveToFirst()) {
                 do {
@@ -162,11 +190,16 @@ public class MainActivity extends AppCompatActivity{
                     memoList.add(new MemoInfo(memoTitle, date, memoContent, memoAttachment, hash));
                 } while (allMemo.moveToNext());
             }
+            allMemo.close();
             return memoList;
         }
 
         protected void onPostExecute(ArrayList<MemoInfo> result) {
             updateView(result);
         }
+    }
+
+    private boolean isSignedIn() {
+        return (user != null);
     }
 }

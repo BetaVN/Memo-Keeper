@@ -27,6 +27,9 @@
         <activity
             android:name=".MemoEditor.MemoEditActivity"
             android:label="MemoEditActivity" />
+        <activity
+            android:name=".ProfilePage.ProfilePageActivity"
+            android:label="ProfilePageActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
