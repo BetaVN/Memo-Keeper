@@ -69,7 +69,7 @@ public class ProfilePageActivity extends AppCompatActivity {
             case R.id.action_google_signout:
                 AlertDialog.Builder confirmDialog = new AlertDialog.Builder(ProfilePageActivity.this);
                 confirmDialog.setTitle("Confirmation");
-                confirmDialog.setMessage("Do you wish to save your memo?");
+                confirmDialog.setMessage("Do you wish to sign out of this account?");
                 confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

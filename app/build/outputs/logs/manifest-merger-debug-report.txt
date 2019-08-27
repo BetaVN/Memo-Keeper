@@ -11,6 +11,7 @@ MERGED from [androidx.media:media:1.0.1] /home/cpu10856/.gradle/caches/transform
 MERGED from [androidx.constraintlayout:constraintlayout:1.1.3] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/0fc5552f7b7b7a25b7d285d1be49e101/AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.recyclerview:recyclerview:1.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/88d66ffeccc1411bb9ef5cd1383bd091/AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/AndroidManifest.xml:17:1-39:12
+MERGED from [com.google.android.gms:play-services-drive:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/00eb781adc22a3b6307f9ca67cf7fc4e/AndroidManifest.xml:17:1-24:12
 MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/9ff7b09b50aac2b7939318012fa2eb83/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-auth-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/864873179c135edb7d3dc65a88298bd1/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/fa3640c43772ecf7ea2d22910e6ce13e/AndroidManifest.xml:17:1-29:12
@@ -76,6 +77,8 @@ MERGED from [androidx.constraintlayout:constraintlayout:1.1.3] /home/cpu10856/.g
 MERGED from [androidx.constraintlayout:constraintlayout:1.1.3] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/0fc5552f7b7b7a25b7d285d1be49e101/AndroidManifest.xml:9:5-20
 MERGED from [com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/AndroidManifest.xml:22:5-37:19
 MERGED from [com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/AndroidManifest.xml:22:5-37:19
+MERGED from [com.google.android.gms:play-services-drive:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/00eb781adc22a3b6307f9ca67cf7fc4e/AndroidManifest.xml:22:5-20
+MERGED from [com.google.android.gms:play-services-drive:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/00eb781adc22a3b6307f9ca67cf7fc4e/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/fa3640c43772ecf7ea2d22910e6ce13e/AndroidManifest.xml:22:5-27:19
 MERGED from [com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/fa3640c43772ecf7ea2d22910e6ce13e/AndroidManifest.xml:22:5-27:19
 MERGED from [com.google.android.gms:play-services-tasks:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/9e8da45fa7f99dfbd32cadc9b75d9841/AndroidManifest.xml:7:5-20
@@ -164,6 +167,8 @@ MERGED from [androidx.recyclerview:recyclerview:1.0.0] /home/cpu10856/.gradle/ca
 MERGED from [androidx.recyclerview:recyclerview:1.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/88d66ffeccc1411bb9ef5cd1383bd091/AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/195680caff2618fffa6b2c92b1cb856d/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-drive:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/00eb781adc22a3b6307f9ca67cf7fc4e/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-drive:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/00eb781adc22a3b6307f9ca67cf7fc4e/AndroidManifest.xml:20:5-44
 MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/9ff7b09b50aac2b7939318012fa2eb83/AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/9ff7b09b50aac2b7939318012fa2eb83/AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.gms:play-services-auth-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/864873179c135edb7d3dc65a88298bd1/AndroidManifest.xml:5:5-44

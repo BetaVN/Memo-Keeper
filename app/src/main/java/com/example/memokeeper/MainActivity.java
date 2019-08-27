@@ -161,8 +161,7 @@ public class MainActivity extends AppCompatActivity{
         }
         if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
             if (ResultCode == RESULT_OK) {
-                Intent signOut = getIntent();
-                if (signOut.getBooleanExtra("Sign out", false)) {
+                if (data.getBooleanExtra("Sign out", false)) {
                     user = null;
                 }
             }
