@@ -16,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
+import com.example.memokeeper.DriveFunctions.DriveQuickstart;
 import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
@@ -27,6 +28,8 @@ import com.example.memokeeper.Utilities.PathUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +52,16 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
+            DriveQuickstart.main("");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("Drive:", "1");
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            Log.d("Drive:", "2");
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -195,6 +208,15 @@ public class MainActivity extends AppCompatActivity{
 
         protected void onPostExecute(ArrayList<MemoInfo> result) {
             updateView(result);
+        }
+    }
+
+    private class DriveTestAsync extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            return null;
         }
     }
 

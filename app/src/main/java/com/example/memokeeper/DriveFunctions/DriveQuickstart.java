@@ -1,5 +1,7 @@
 package com.example.memokeeper.DriveFunctions;
 
+import android.os.Environment;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -50,10 +52,16 @@ public class DriveQuickstart {
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
+        java.io.File tokenFolder = new java.io.File(Environment.getExternalStorageDirectory() +
+                java.io.File.separator + TOKENS_DIRECTORY_PATH);
+        if (!tokenFolder.exists()) {
+            tokenFolder.mkdirs();
+        }
+
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(new FileDataStoreFactory(tokenFolder))
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
@@ -62,7 +70,7 @@ public class DriveQuickstart {
 
     public static void main(String... args) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        final NetHttpTransport HTTP_TRANSPORT = new NetHttpTransport();
         Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
