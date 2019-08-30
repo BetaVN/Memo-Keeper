@@ -14,8 +14,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
+
+import java.util.Collections;
 
 public class ProfilePageActivity extends AppCompatActivity {
 
@@ -25,7 +33,8 @@ public class ProfilePageActivity extends AppCompatActivity {
     private GoogleSignInAccount user;
     private MenuInflater inflater;
     private Toolbar profileToolbar;
-
+    private GoogleAccountCredential credential;
+    private DriveServiceHelper driveServiceHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +60,10 @@ public class ProfilePageActivity extends AppCompatActivity {
 
         googleName.setText(user.getDisplayName());
         googleEmail.setText(user.getEmail());
+        credential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE));
+        credential.setSelectedAccount(user.getAccount());
+        Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("Memo Keeper").build();
+        driveServiceHelper = new DriveServiceHelper(googleDriveService);
 
         setSupportActionBar(profileToolbar);
         getSupportActionBar().setTitle("Account Information");

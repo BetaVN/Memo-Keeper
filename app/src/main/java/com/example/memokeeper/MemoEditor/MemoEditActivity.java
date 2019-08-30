@@ -92,7 +92,7 @@ public class MemoEditActivity extends AppCompatActivity {
         items = new ArrayList<>();
         newFilePath = new ArrayList<>();
         String memoAttachment = intent.getStringExtra("memoAttachment");
-        if (memoAttachment != null) {
+        if ((memoAttachment != null) && (memoAttachment.isEmpty() == false)) {
             attachedFilePath = new ArrayList<>(Arrays.asList(memoAttachment.split("::")));
         }
         else {

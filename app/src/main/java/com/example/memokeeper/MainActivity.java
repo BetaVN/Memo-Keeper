@@ -1,11 +1,16 @@
 package com.example.memokeeper;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
@@ -16,7 +21,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
-import com.example.memokeeper.DriveFunctions.DriveQuickstart;
 import com.example.memokeeper.MainScreen.MemoAdapter;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.MainScreen.VerticalSpaceItemDecoration;
@@ -28,8 +32,6 @@ import com.example.memokeeper.Utilities.PathUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
 
     private GoogleSignInAccount user = null;
 
+    final private int PERMISSION_REQUEST = 1;
     private MenuInflater inflater;
     private MemoAdapter memoAdapter;
     private ArrayList<MemoInfo> memo;
@@ -52,15 +55,7 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            DriveQuickstart.main("");
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d("Drive:", "1");
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            Log.d("Drive:", "2");
-        }
+        checkPermission();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -211,16 +206,35 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private class DriveTestAsync extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... strings) {
-
-            return null;
-        }
-    }
-
     private boolean isSignedIn() {
         return (user != null);
+    }
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            }
+        }
     }
 }

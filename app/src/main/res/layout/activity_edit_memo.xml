@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/memoEditBar"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
@@ -18,7 +18,7 @@
 
     <EditText
         android:id="@+id/titleEditText"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="72dp"
         android:ems="10"
         android:hint="@string/memo_title"
@@ -30,7 +30,7 @@
         app:layout_constraintVertical_bias="0.0" />
     <TextView
         android:id="@+id/textAttachedItems"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="20dp"
         android:ems="10"
         android:text="Attached Files"
@@ -42,7 +42,7 @@
         app:layout_constraintTop_toBottomOf="@id/titleEditText" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/attachedItemList"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="80dp"
         app:layout_constraintBottom_toTopOf="@id/memoEditText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
 
     <EditText
         android:id="@+id/memoEditText"
-        android:layout_width="411dp"
+        android:layout_width="match_parent"
         android:layout_height="491dp"
         android:ems="10"
         android:gravity="start|top"
