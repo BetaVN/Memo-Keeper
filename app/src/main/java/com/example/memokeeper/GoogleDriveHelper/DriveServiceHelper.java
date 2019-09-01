@@ -16,7 +16,9 @@ package com.example.memokeeper.GoogleDriveHelper;
  * limitations under the License.
  */
 
+import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,9 +27,11 @@ import android.util.Pair;
 
 import androidx.annotation.Nullable;
 
+import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
@@ -53,6 +57,8 @@ import java.util.concurrent.Executors;
  */
 public class DriveServiceHelper {
 
+    public Context context;
+
     public static String TYPE_AUDIO = "application/vnd.google-apps.audio";
     public static String TYPE_GOOGLE_DOCS = "application/vnd.google-apps.document";
     public static String TYPE_GOOGLE_DRAWING = "application/vnd.google-apps.drawing";
@@ -73,8 +79,9 @@ public class DriveServiceHelper {
     private final Executor mExecutor = Executors.newSingleThreadExecutor();
     private final Drive mDriveService;
 
-    public DriveServiceHelper(Drive driveService) {
+    public DriveServiceHelper(Drive driveService, Context profile_page) {
         mDriveService = driveService;
+        context = profile_page;
     }
 
     /**
@@ -222,14 +229,18 @@ public class DriveServiceHelper {
 
     public Task<GoogleDriveFileHolder> searchFolder(String folderName) {
         return Tasks.call(mExecutor, () -> {
-
-            // Retrive the metadata as a File object.
-            FileList result = mDriveService.files().list()
-                    .setQ("mimeType = '" + DriveFolder.MIME_TYPE + "' and name = '" + folderName + "' ")
-                    .setSpaces("drive")
-                    .execute();
+            FileList result = null;
+            // Retrieve the metadata as a File object.
+            try {
+                result = mDriveService.files().list()
+                        .setQ("mimeType = '" + DriveFolder.MIME_TYPE + "' and name = '" + folderName + "' ")
+                        .setSpaces("drive")
+                        .execute();
+            } catch (UserRecoverableAuthIOException e) {
+                ((Activity) context).startActivityForResult(e.getIntent(), REQUEST_CODE.DRIVE_AUTH);
+            }
             GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
-            if (result.getFiles().size() > 0) {
+            if ((result != null) &&(result.getFiles().size() > 0)) {
                 googleDriveFileHolder.setId(result.getFiles().get(0).getId());
                 googleDriveFileHolder.setName(result.getFiles().get(0).getName());
 

@@ -105,5 +105,12 @@ public final class MemoContract {
                 Log.d("Database", "Failed to update memo!");
             }
         }
+
+        public Cursor getAllFolders() {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String[] projection = {MemoEntry.COLLUMN_MEMO_HASH};
+            Cursor result = db.query( MemoEntry.TABLE_NAME, projection, "0=0", null, null, null, MemoEntry.COLLUMN_MEMO_DATE + " DESC");
+            return result;
+        }
     }
 }

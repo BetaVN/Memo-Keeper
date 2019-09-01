@@ -6,4 +6,8 @@
     <string name="memo_text">Type your memo here</string>
     <string name="title_activity_memo_attachment">MemoAttachmentActivity</string>
     <string name="sign_in_line">Please select a sign in method below</string>
+    <string name="report">View memo statistics</string>
+    <string name="sync">Backup to Google Drive</string>
+    <string name="pull">Download memo from Google Drive</string>
+    <string name="backup_folder_name">Memo Keeper data</string>
 </resources>

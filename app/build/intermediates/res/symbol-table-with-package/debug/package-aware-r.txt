@@ -1153,6 +1153,10 @@ id dimensions
 id direct
 id disableHome
 id divider
+id divider2
+id divider3
+id divider4
+id divider5
 id edit_query
 id end
 id end_padder
@@ -1226,7 +1230,9 @@ id pin
 id profileToolbar
 id progress_circular
 id progress_horizontal
+id pullButton
 id radio
+id reportButton
 id right
 id right_icon
 id right_side
@@ -1276,6 +1282,7 @@ id status_bar_latest_event_content
 id stretch
 id submenuarrow
 id submit_area
+id syncButton
 id tabMode
 id tag_transition_group
 id tag_unhandled_key_event_manager
@@ -1450,6 +1457,7 @@ string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
 string app_name
 string appbar_scrolling_view_behavior
+string backup_folder_name
 string bottom_sheet_behavior
 string character_counter_content_description
 string character_counter_pattern
@@ -1484,9 +1492,12 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string pull
+string report
 string search_menu_title
 string sign_in_line
 string status_bar_notification_info_overflow
+string sync
 string title_activity_memo_attachment
 style AlertDialog_AppCompat
 style AlertDialog_AppCompat_Light
