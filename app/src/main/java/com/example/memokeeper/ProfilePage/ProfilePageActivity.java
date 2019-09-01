@@ -1,5 +1,6 @@
 package com.example.memokeeper.ProfilePage;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,11 +28,9 @@ import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.GoogleDriveHelper.GoogleDriveFileHolder;
 import com.example.memokeeper.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
@@ -41,15 +40,13 @@ import com.google.api.services.drive.DriveScopes;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ProfilePageActivity extends AppCompatActivity {
 
     private String backupFolderName;
     private Boolean backupFolderCreated = false;
     private Boolean grabbingAllHash = true;
+    private Context context = this;
 
     private ImageView googleAvatar;
     private TextView googleEmail;
@@ -112,7 +109,19 @@ public class ProfilePageActivity extends AppCompatActivity {
         syncGG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                syncWithGGDrive();
+                syncProcess();
+            }
+        });
+        pullGG.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Not implemented yet.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        statistic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Not implemented yet.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -179,6 +188,7 @@ public class ProfilePageActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(ArrayList<String> result) {
+            //result.add("databases");
             allMemoFolders = result;
             grabbingAllHash = false;
         }
@@ -218,8 +228,7 @@ public class ProfilePageActivity extends AppCompatActivity {
         return newFolder;
     }
 
-
-    private void syncWithGGDrive() {
+    private void syncProcess() {
         if (grabbingAllHash == true) {
             Toast.makeText(this, "Currently getting all of your memos. Please wait.", Toast.LENGTH_SHORT).show();
             return;
@@ -231,7 +240,9 @@ public class ProfilePageActivity extends AppCompatActivity {
             Toast.makeText(this, "You don't have any memo to backup.", Toast.LENGTH_SHORT).show();
             return;
         }
+        uploadDatabase();
         for (String hash: allMemoFolders) {
+            Toast.makeText(this, "Backing up memo...", Toast.LENGTH_SHORT).show();
             Task<GoogleDriveFileHolder> checkForExistingFolders = driveServiceHelper.searchFolder(hash);
             checkForExistingFolders.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                 @Override
@@ -317,6 +328,64 @@ public class ProfilePageActivity extends AppCompatActivity {
                         }
                     });
                 }
+            }
+        });
+    }
+
+    private void uploadDatabase() {
+        File database = getDatabasePath(MemoContract.MemoDbHelper.DATABASE_NAME);
+        Task<GoogleDriveFileHolder> checkForExistingFolders = driveServiceHelper.searchFolder("databases");
+        checkForExistingFolders.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+            @Override
+            public void onSuccess(GoogleDriveFileHolder result) {
+                if (checkForExistingFolders.isSuccessful()) {
+                    if (result.getName() == null) {
+                        Log.d("Sync: ", "Begin new upload...");
+                        Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
+
+                        createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                            @Override
+                            public void onSuccess(GoogleDriveFileHolder result) {
+                                Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
+                                uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                                    @Override
+                                    public void onSuccess(GoogleDriveFileHolder result) {
+                                        Log.d("Sync: ", "Database updated.");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        Log.d("Sync: ", "Overwriting folder...");
+                        Task<Void>  deleteCurrentFolder = driveServiceHelper.deleteFolderFile(result.getId());
+                        deleteCurrentFolder.addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
+
+                                createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                                    @Override
+                                    public void onSuccess(GoogleDriveFileHolder result) {
+                                        Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
+                                        uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
+                                            @Override
+                                            public void onSuccess(GoogleDriveFileHolder result) {
+                                                Log.d("Sync: ", "Database updated.");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        checkForExistingFolders.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
             }
         });
     }
