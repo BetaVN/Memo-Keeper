@@ -26,6 +26,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
 import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.GoogleDriveHelper.GoogleDriveFileHolder;
+import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,8 +39,13 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class ProfilePageActivity extends AppCompatActivity {
 
@@ -47,6 +53,7 @@ public class ProfilePageActivity extends AppCompatActivity {
     private Boolean backupFolderCreated = false;
     private Boolean grabbingAllHash = true;
     private Context context = this;
+    private Boolean isUploading = false;
 
     private ImageView googleAvatar;
     private TextView googleEmail;
@@ -60,8 +67,10 @@ public class ProfilePageActivity extends AppCompatActivity {
     private GoogleAccountCredential credential;
     private DriveServiceHelper driveServiceHelper;
     private MemoContract.MemoDbHelper dbHelper;
+    private MemoContract.BackupDbHelper backupDbHelper;
     private ArrayList<String> allMemoFolders;
     private MemoHashGrabber hashGrabber = new MemoHashGrabber();
+    private ArrayList<Task<?>> allConcurrentTasks = new ArrayList<>();
 
     private GoogleDriveFileHolder backupFolder;
 
@@ -72,6 +81,7 @@ public class ProfilePageActivity extends AppCompatActivity {
 
         backupFolderName = getString(R.string.backup_folder_name);
         dbHelper = new MemoContract().new MemoDbHelper(this);
+        backupDbHelper = new MemoContract().new BackupDbHelper(this);
         hashGrabber.execute("");
 
         Intent intent = getIntent();
@@ -114,9 +124,7 @@ public class ProfilePageActivity extends AppCompatActivity {
         });
         pullGG.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "Not implemented yet.", Toast.LENGTH_SHORT).show();
-            }
+            public void onClick(View view) { restoreProcess(); }
         });
         statistic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,15 +188,16 @@ public class ProfilePageActivity extends AppCompatActivity {
             if (allMemoHash.moveToFirst()) {
                 do {
                     String hash = allMemoHash.getString(allMemoHash.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
+                    Log.d("Hash: ", hash + "" + Integer.toString(allMemoHash.getCount()));
                     allFolders.add(hash);
                 } while (allMemoHash.moveToNext());
             }
             allMemoHash.close();
+            Log.d("Hash: ", "Here?");
             return allFolders;
         }
 
         protected void onPostExecute(ArrayList<String> result) {
-            //result.add("databases");
             allMemoFolders = result;
             grabbingAllHash = false;
         }
@@ -229,21 +238,23 @@ public class ProfilePageActivity extends AppCompatActivity {
     }
 
     private void syncProcess() {
-        if (grabbingAllHash == true) {
+        if (grabbingAllHash) {
             Toast.makeText(this, "Currently getting all of your memos. Please wait.", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (backupFolderCreated == false) {
+        if (!backupFolderCreated) {
             Toast.makeText(this, "No backup folder detected.", Toast.LENGTH_SHORT).show();
         }
         if (allMemoFolders.size() == 0) {
             Toast.makeText(this, "You don't have any memo to backup.", Toast.LENGTH_SHORT).show();
             return;
         }
+        isUploading = true;
         uploadDatabase();
         for (String hash: allMemoFolders) {
             Toast.makeText(this, "Backing up memo...", Toast.LENGTH_SHORT).show();
             Task<GoogleDriveFileHolder> checkForExistingFolders = driveServiceHelper.searchFolder(hash);
+            allConcurrentTasks.add(checkForExistingFolders);
             checkForExistingFolders.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                 @Override
                 public void onSuccess(GoogleDriveFileHolder result) {
@@ -272,6 +283,15 @@ public class ProfilePageActivity extends AppCompatActivity {
                 }
             });
         }
+        Task<Void> checkUploadDone = driveServiceHelper.checkAllTaskProgress(allConcurrentTasks);
+        checkUploadDone.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                isUploading = false;
+                Toast.makeText(context, "Memo backup is complete.", Toast.LENGTH_LONG).show();
+                allConcurrentTasks.clear();
+            }
+        });
     }
 
     private String getMimeType(File target) {
@@ -313,7 +333,6 @@ public class ProfilePageActivity extends AppCompatActivity {
 
     private void uploadNewMemoFolder(String hash) {
         Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder(hash, backupFolder.getId());
-
         createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
             @Override
             public void onSuccess(GoogleDriveFileHolder result) {
@@ -321,6 +340,7 @@ public class ProfilePageActivity extends AppCompatActivity {
                 for (File uploadFile: memoFiles) {
                     String mimeType = getMimeType(uploadFile);
                     Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(uploadFile, mimeType, result.getId());
+                    allConcurrentTasks.add(uploadFileTask);
                     uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                         @Override
                         public void onSuccess(GoogleDriveFileHolder result) {
@@ -342,11 +362,11 @@ public class ProfilePageActivity extends AppCompatActivity {
                     if (result.getName() == null) {
                         Log.d("Sync: ", "Begin new upload...");
                         Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
-
                         createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                             @Override
                             public void onSuccess(GoogleDriveFileHolder result) {
                                 Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
+                                allConcurrentTasks.add(uploadFileTask);
                                 uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                                     @Override
                                     public void onSuccess(GoogleDriveFileHolder result) {
@@ -363,11 +383,11 @@ public class ProfilePageActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
-
                                 createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                                     @Override
                                     public void onSuccess(GoogleDriveFileHolder result) {
                                         Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
+                                        allConcurrentTasks.add(uploadFileTask);
                                         uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                                             @Override
                                             public void onSuccess(GoogleDriveFileHolder result) {
@@ -388,5 +408,134 @@ public class ProfilePageActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void restoreProcess() {
+        if (isUploading) {
+            Toast.makeText(this, "Currently uploading backup files. Please wait.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        File backupDirectory = new File(getFilesDir(), "temp");
+        if (backupDirectory.exists()) {
+            backupDirectory.delete();
+        }
+        Task<List<GoogleDriveFileHolder>> backupFileList = driveServiceHelper.queryFiles(backupFolder.getId());
+        backupFileList.addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+            @Override
+            public void onSuccess(List<GoogleDriveFileHolder> result) {
+                if (!backupDirectory.exists()) {
+                    backupDirectory.mkdir();
+                }
+                for (GoogleDriveFileHolder file: result) {
+                    pullFolderFromDrive(file, backupDirectory);
+                }
+                Task<Void> checkDownloadDone = driveServiceHelper.checkAllTaskProgress(allConcurrentTasks);
+                checkDownloadDone.addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(context, "Memo download is complete.", Toast.LENGTH_LONG).show();
+                        allConcurrentTasks.clear();
+                        updateNewFilesFromBackup(backupDirectory);
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void pullFolderFromDrive(GoogleDriveFileHolder result, File backupDir) {
+        File newMemoFolder = new File(backupDir.getAbsolutePath(), result.getName());
+        if (!newMemoFolder.exists()) {
+            newMemoFolder.mkdir();
+        }
+        Task<List<GoogleDriveFileHolder>> allFiles = driveServiceHelper.queryFiles(result.getId());
+        allFiles.addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+            @Override
+            public void onSuccess(List<GoogleDriveFileHolder> memoFiles) {
+                for (GoogleDriveFileHolder memoFile: memoFiles) {
+                    Task<Void> downloadFile = driveServiceHelper.downloadFile(newMemoFolder, memoFile.getId());
+                    allConcurrentTasks.add(downloadFile);
+                    downloadFile.addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("Download: ", memoFile.getName() + "");
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateNewFilesFromBackup(File backupDir) {
+        File[] listOfFolders = backupDir.listFiles();
+        for (File folder: listOfFolders) {
+            if (folder.isDirectory()) {
+                if (folder.getName().equals("databases")) {
+                    Log.d("Database: ", "Ok, we are here?");
+                    File database = new File(folder.getAbsolutePath(), MemoContract.MemoEntry.TABLE_NAME + ".db");
+                    File newDatabase = new File(folder.getAbsolutePath(), MemoContract.MemoEntry.BACKUP_TABLE_NAME + ".db");
+                    if (database.exists()) {
+                        database.renameTo(newDatabase);
+                    }
+                    File databaseDir = new File(getDatabasePath(MemoContract.MemoEntry.TABLE_NAME).getParent());
+                    moveFile(newDatabase, databaseDir);
+                    File test = new File(databaseDir, MemoContract.MemoEntry.BACKUP_TABLE_NAME + ".db");
+                    Log.d("Database: ", "New database moved?: " + Boolean.toString(test.exists()));
+                    Cursor allMemo = backupDbHelper.getAllMemo();
+                    ArrayList<MemoInfo> memoList = new ArrayList<>();
+                    if (allMemo.moveToFirst()) {
+                        do {
+                            String memoTitle = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_TITLE));
+                            String memoContent = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_CONTENT));
+                            String memoAttachment = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_ATTACHMENT));
+                            int date = allMemo.getInt(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_DATE));
+                            String hash = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
+                            memoList.add(new MemoInfo(memoTitle, date, memoContent, memoAttachment, hash));
+                        } while (allMemo.moveToNext());
+                    }
+                    allMemo.close();
+                    dbHelper.updateFromBackup(memoList);
+                    continue;
+                }
+                File currentFolder = new File(getFilesDir(), folder.getName());
+                if (!currentFolder.exists()) {
+                    currentFolder.mkdir();
+                    File[] files = folder.listFiles();
+                    for (File file: files) {
+                        moveFile(file, currentFolder);
+                    }
+                }
+                else {
+                    File[] removeCurrentFiles = currentFolder.listFiles();
+                    for (File file: removeCurrentFiles) {
+                        file.delete();
+                    }
+                    File[] files = folder.listFiles();
+                    for (File file: files) {
+                        moveFile(file, currentFolder);
+                    }
+                }
+            }
+        }
+    }
+
+    private void moveFile(File newFile, File targetDir) {
+        try {
+            FileInputStream inputStream = new FileInputStream(newFile);
+            Log.d("Output loc", targetDir.getAbsolutePath() + "");
+            FileOutputStream outputStream = new FileOutputStream(targetDir);
+            byte[] b = new byte[1024];
+            int len;
+            while ((len = inputStream.read(b)) > 0) {
+                outputStream.write(b, 0, len);
+            }
+            inputStream.close();
+            outputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 }

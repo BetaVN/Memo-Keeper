@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.Nullable;
@@ -369,6 +370,22 @@ public class DriveServiceHelper {
 
             return null;
 
+        });
+    }
+
+    public Task<Void> checkAllTaskProgress(ArrayList<Task<?>> allTasks) {
+        return Tasks.call(mExecutor, () -> {
+            Boolean allTaskCompleted = false;
+            while (!allTaskCompleted) {
+                allTaskCompleted = true;
+                for (Task<?> task : allTasks) {
+                    if (!task.isComplete()) {
+                        allTaskCompleted = false;
+                        break;
+                    }
+                }
+            }
+            return null;
         });
     }
 

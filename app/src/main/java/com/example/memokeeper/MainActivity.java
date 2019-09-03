@@ -55,11 +55,10 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        checkPermission();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkPermission();
 
         Toolbar mainScreenToolbar = findViewById(R.id.mainScreenToolbar);
         dbHelper = new MemoContract().new MemoDbHelper(context);
