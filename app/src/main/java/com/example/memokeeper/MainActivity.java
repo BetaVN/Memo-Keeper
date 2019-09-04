@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity{
             else if (ResultCode == RESULT_CANCELED) {
                 if (newMemoCreated) {
                     File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
-                    deleteFolder.delete();
+                    PathUtils.folderClean(deleteFolder);
                     newMemoCreated = false;
                 }
             }
@@ -172,6 +172,11 @@ public class MainActivity extends AppCompatActivity{
                     user = null;
                 }
             }
+        }
+        if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
+            memo.clear();
+            memoGrabber = new MemoAsync();
+            memoGrabber.execute("");
         }
     }
 

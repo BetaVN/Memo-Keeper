@@ -158,4 +158,14 @@ public class PathUtils {
 
         return sb.toString();
     }
+
+    public static void folderClean(File folder) {
+        if (folder.isDirectory()) {
+            java.io.File[] allFiles = folder.listFiles();
+            for (java.io.File file: allFiles) {
+                folderClean(file);
+            }
+        }
+        folder.delete();
+    }
 }

@@ -1,0 +1,131 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.memokeeper"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+8-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="28" />
+9-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+11-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:5:5-80
+11-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:5:22-77
+12    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+12-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:6:5-81
+12-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:6:22-78
+13    <uses-permission android:name="android.permission.INTERNET" />
+13-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:7:5-67
+13-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:7:22-64
+14
+15    <application
+15-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:9:5-43:19
+16        android:name="androidx.multidex.MultiDexApplication"
+16-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:16:9-61
+17        android:allowBackup="true"
+17-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:10:9-35
+18        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+18-->[androidx.core:core:1.0.1] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/72b2b92ec4ab73ff21fb9bc348de3b22/core-1.0.1/AndroidManifest.xml:22:18-86
+19        android:debuggable="true"
+20        android:icon="@mipmap/ic_launcher"
+20-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:11:9-43
+21        android:label="@string/app_name"
+21-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:12:9-41
+22        android:roundIcon="@mipmap/ic_launcher_round"
+22-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:13:9-54
+23        android:supportsRtl="true"
+23-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:14:9-35
+24        android:testOnly="true"
+25        android:theme="@style/AppTheme" >
+25-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:15:9-40
+26        <activity android:name="com.example.memokeeper.ProfilePage.SignInActivity" />
+26-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:18:9-73
+26-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:18:19-61
+27
+28        <provider
+28-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:20:9-28:20
+29            android:name="androidx.core.content.FileProvider"
+29-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:21:13-62
+30            android:authorities="com.example.memokeeper.FileProvider"
+30-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:22:13-70
+31            android:exported="false"
+31-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:23:13-37
+32            android:grantUriPermissions="true" >
+32-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:24:13-47
+33            <meta-data
+33-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:25:13-27:54
+34                android:name="android.support.FILE_PROVIDER_PATHS"
+34-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:26:17-67
+35                android:resource="@xml/file_paths" />
+35-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:27:17-51
+36        </provider>
+37
+38        <activity
+38-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:30:9-32:48
+39            android:name="com.example.memokeeper.MemoEditor.MemoEditActivity"
+39-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:31:13-56
+40            android:label="MemoEditActivity" />
+40-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:32:13-45
+41        <activity
+41-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:33:9-35:51
+42            android:name="com.example.memokeeper.ProfilePage.ProfilePageActivity"
+42-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:34:13-60
+43            android:label="ProfilePageActivity" />
+43-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:35:13-48
+44        <activity android:name="com.example.memokeeper.MainActivity" >
+44-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:36:9-42:20
+44-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:36:19-47
+45            <intent-filter>
+45-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:37:13-41:29
+46                <action android:name="android.intent.action.MAIN" />
+46-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:38:17-69
+46-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:38:25-66
+47
+48                <category android:name="android.intent.category.LAUNCHER" />
+48-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:40:17-77
+48-->/home/cpu10856/AndroidStudioProjects/Memo-Keeper/app/src/main/AndroidManifest.xml:40:27-74
+49            </intent-filter>
+50        </activity>
+51        <activity
+51-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:23:9-27:75
+52            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+52-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:24:13-93
+53            android:excludeFromRecents="true"
+53-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:25:13-46
+54            android:exported="false"
+54-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:26:13-37
+55            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+55-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:27:13-72
+56        <!--
+57            Service handling Google Sign-In user revocation. For apps that do not integrate with
+58            Google Sign-In, this service will never be started.
+59        -->
+60        <service
+60-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:33:9-36:110
+61            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+61-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:34:13-89
+62            android:exported="true"
+62-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:35:13-36
+63            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION" />
+63-->[com.google.android.gms:play-services-auth:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/f3cd088eede6db1b65bf9a5737bc46f5/play-services-auth-17.0.0/AndroidManifest.xml:36:13-107
+64
+65        <activity
+65-->[com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/291563c6708268cf4683b088770f2b39/play-services-base-17.0.0/AndroidManifest.xml:23:9-26:75
+66            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+66-->[com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/291563c6708268cf4683b088770f2b39/play-services-base-17.0.0/AndroidManifest.xml:24:13-79
+67            android:exported="false"
+67-->[com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/291563c6708268cf4683b088770f2b39/play-services-base-17.0.0/AndroidManifest.xml:25:13-37
+68            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+68-->[com.google.android.gms:play-services-base:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/291563c6708268cf4683b088770f2b39/play-services-base-17.0.0/AndroidManifest.xml:26:13-72
+69
+70        <meta-data
+70-->[com.google.android.gms:play-services-basement:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ecb6d8c67dfbaf5d1b7df5cf3ec811d9/jetified-play-services-basement-17.0.0/AndroidManifest.xml:23:9-25:69
+71            android:name="com.google.android.gms.version"
+71-->[com.google.android.gms:play-services-basement:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ecb6d8c67dfbaf5d1b7df5cf3ec811d9/jetified-play-services-basement-17.0.0/AndroidManifest.xml:24:13-58
+72            android:value="@integer/google_play_services_version" />
+72-->[com.google.android.gms:play-services-basement:17.0.0] /home/cpu10856/.gradle/caches/transforms-2/files-2.1/ecb6d8c67dfbaf5d1b7df5cf3ec811d9/jetified-play-services-basement-17.0.0/AndroidManifest.xml:25:13-66
+73    </application>
+74
+75</manifest>
