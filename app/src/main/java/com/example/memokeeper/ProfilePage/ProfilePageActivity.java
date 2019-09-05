@@ -64,7 +64,6 @@ public class ProfilePageActivity extends AppCompatActivity {
     private GoogleAccountCredential credential;
     private DriveServiceHelper driveServiceHelper;
     private MemoContract.MemoDbHelper dbHelper;
-    private MemoContract.BackupDbHelper backupDbHelper;
     private ArrayList<MemoInfo> allMemoFolders;
     private MemoHashGrabber hashGrabber = new MemoHashGrabber();
 
@@ -77,7 +76,6 @@ public class ProfilePageActivity extends AppCompatActivity {
 
         backupFolderName = getString(R.string.backup_folder_name);
         dbHelper = new MemoContract().new MemoDbHelper(this);
-        backupDbHelper = new MemoContract().new BackupDbHelper(this);
         hashGrabber.execute("");
         Intent intent = getIntent();
         user = intent.getParcelableExtra("user");

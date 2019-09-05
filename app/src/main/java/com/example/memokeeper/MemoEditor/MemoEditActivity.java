@@ -84,6 +84,19 @@ public class MemoEditActivity extends AppCompatActivity {
 
             }
         }
+
+        if (ContextCompat.checkSelfPermission(MemoEditActivity.this,
+                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MemoEditActivity.this, Manifest.permission.INTERNET)) {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MemoEditActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
+
+            }
+        }
         Intent intent = getIntent();
         Toolbar editToolbar = findViewById(R.id.memoEditBar);
         titleField = findViewById(R.id.titleEditText);
@@ -169,6 +182,10 @@ public class MemoEditActivity extends AppCompatActivity {
                 if(resultCode==RESULT_OK){
                     Uri content = data.getData();
                     String filePath = PathUtils.getPath(context, content);
+                    if (filePath == null || filePath.isEmpty()) {
+                        Toast.makeText(this, "Something has gone wrong. Please select from a different tab or use a file explorer to pick your file.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {
@@ -185,6 +202,10 @@ public class MemoEditActivity extends AppCompatActivity {
                 if(resultCode==RESULT_OK){
                     Uri content = data.getData();
                     String filePath = PathUtils.getPath(context, content);
+                    if (filePath == null || filePath.isEmpty()) {
+                        Toast.makeText(this, "Something has gone wrong. Please select from a different tab or use a file explorer to pick your file.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     File newFile = new File(filePath);
                     Boolean success = addNewFilesLocal(newFile);
                     if (success) {

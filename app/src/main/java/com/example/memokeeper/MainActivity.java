@@ -240,5 +240,18 @@ public class MainActivity extends AppCompatActivity{
 
             }
         }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.INTERNET)) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
+
+            }
+        }
     }
 }

@@ -126,31 +126,4 @@ public final class MemoContract {
             }
         }
     }
-
-    public class BackupDbHelper extends SQLiteOpenHelper {
-
-        public static final int DATABASE_VERSION = 1;
-        public static final String DATABASE_NAME = MemoEntry.BACKUP_TABLE_NAME + ".db";
-
-        public BackupDbHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            return;
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            return;
-        }
-
-        public Cursor getAllMemo() {
-            SQLiteDatabase db = this.getReadableDatabase();
-            String[] projection = { MemoEntry.COLLUMN_MEMO_TITLE, MemoEntry.COLLUMN_MEMO_CONTENT, MemoEntry.COLLUMN_MEMO_ATTACHMENT, MemoEntry.COLLUMN_MEMO_DATE, MemoEntry.COLLUMN_MEMO_HASH};
-            Cursor result = db.query( MemoEntry.TABLE_NAME, projection, "0=0", null, null, null, MemoEntry.COLLUMN_MEMO_DATE + " DESC");
-            return result;
-        }
-    }
 }
