@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
 import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.GoogleDriveHelper.GoogleDriveFileHolder;
@@ -168,7 +169,7 @@ public class ProfilePageActivity extends AppCompatActivity {
     private void signOut() {
         Intent signOutIntent = new Intent();
         signOutIntent.putExtra("Sign out", true);
-        setResult(RESULT_OK, signOutIntent);
+        setResult(REQUEST_CODE.RESULT_SIGN_OUT, signOutIntent);
         super.finish();
     }
 
@@ -379,7 +380,7 @@ public class ProfilePageActivity extends AppCompatActivity {
             confirmDialog.show();
         }
         else {
-            super.onBackPressed();
+            exitActivity();
         }
     }
 

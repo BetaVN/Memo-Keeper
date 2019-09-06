@@ -10,4 +10,6 @@ public final class REQUEST_CODE {
     public static final int VIEW_PROFILE = 10005;
 
     public static final int DRIVE_AUTH = 10006;
+
+    public static final int RESULT_SIGN_OUT = 100;
 }

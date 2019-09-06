@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity{
             }
         }
         if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
-            if (ResultCode == RESULT_OK) {
+            if (ResultCode == REQUEST_CODE.RESULT_SIGN_OUT) {
                 if (data.getBooleanExtra("Sign out", false)) {
                     user = null;
                 }
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity{
 
     private void updateView(ArrayList<MemoInfo> result) {
         if (memo.addAll(result)) {
-            memoAdapter.notifyItemInserted(memo.size() - 1);
+            memoAdapter.notifyDataSetChanged();
         }
     }
 
