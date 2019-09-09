@@ -25,7 +25,10 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -41,8 +44,6 @@ import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-
-import org.mortbay.util.IO;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -395,9 +396,12 @@ public class DriveServiceHelper {
         });
     }
 
-    public Task<Void> uploadBackupProcess(ArrayList<MemoInfo> allMemo, String backupFolderID) {
+    public Task<Void> uploadBackupProcess(ArrayList<MemoInfo> allMemo, String backupFolderID, ProgressBar progressTracker, TextView taskName) {
         return Tasks.call(mExecutor, () -> {
+            int doneTask = 0;
+            progressTracker.setMax(allMemo.size());
             for (MemoInfo memoInfo : allMemo) {
+                doneTask += 1;
                 FileList result = null;
                 // Retrieve the metadata as a File object.
                 try {
@@ -453,18 +457,22 @@ public class DriveServiceHelper {
                     newFile.setId(fileMeta.getId());
                     newFile.setName(fileMeta.getName());
                 }
+                progressTracker.setProgress(doneTask);
             }
             return null;
         });
     }
 
-    public Task<Void> downloadBackupProcess(String backupFolderId) {
+    public Task<Void> downloadBackupProcess(String backupFolderId, ProgressBar progressTracker, TextView taskName) {
         return Tasks.call(mExecutor, () -> {
             List<GoogleDriveFileHolder> allMemoFolder = findAllFiles(backupFolderId);
             if (allMemoFolder.isEmpty()) {
                 return null;
             }
+            int doneTask = 0;
+            progressTracker.setMax(allMemoFolder.size() + 1);
             for (GoogleDriveFileHolder folder: allMemoFolder) {
+                doneTask += 1;
                 java.io.File memoDir = new java.io.File(context.getFilesDir(), folder.getName());
                 if (memoDir.exists()) {
                     PathUtils.folderClean(memoDir);
@@ -479,6 +487,7 @@ public class DriveServiceHelper {
                     OutputStream outputStream = new FileOutputStream(targetFile);
                     mDriveService.files().get(file.getId()).executeMediaAndDownloadTo(outputStream);
                 }
+                progressTracker.setProgress(doneTask);
             }
             return null;
         });

@@ -1156,7 +1156,6 @@ id divider
 id divider2
 id divider3
 id divider4
-id divider5
 id edit_query
 id end
 id end_padder
@@ -1228,11 +1227,11 @@ id parent_matrix
 id percent
 id pin
 id profileToolbar
+id progressBar
 id progress_circular
 id progress_horizontal
 id pullButton
 id radio
-id reportButton
 id right
 id right_icon
 id right_side
@@ -1287,6 +1286,7 @@ id tabMode
 id tag_transition_group
 id tag_unhandled_key_event_manager
 id tag_unhandled_key_listeners
+id taskRunning
 id text
 id text2
 id textAttachedItems

@@ -1,6 +1,5 @@
 package com.example.memokeeper.ProfilePage;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,12 +56,14 @@ public class ProfilePageActivity extends AppCompatActivity {
     private ImageView googleAvatar;
     private TextView googleEmail;
     private TextView googleName;
-    private TextView statistic;
     private TextView syncGG;
     private TextView pullGG;
+    private TextView taskRunning;
+    private Toolbar profileToolbar;
+    private ProgressBar taskProgressBar;
+
     private GoogleSignInAccount user;
     private MenuInflater inflater;
-    private Toolbar profileToolbar;
     private GoogleAccountCredential credential;
     private DriveServiceHelper driveServiceHelper;
     private MemoContract.MemoDbHelper dbHelper;
@@ -85,9 +87,13 @@ public class ProfilePageActivity extends AppCompatActivity {
         googleEmail = findViewById(R.id.googleEmail);
         googleName = findViewById(R.id.googleName);
         profileToolbar = findViewById(R.id.profileToolbar);
-        statistic = findViewById(R.id.reportButton);
         syncGG = findViewById(R.id.syncButton);
         pullGG = findViewById(R.id.pullButton);
+        taskRunning = findViewById(R.id.taskRunning);
+        taskProgressBar = findViewById(R.id.progressBar);
+
+        taskRunning.setVisibility(View.INVISIBLE);
+        taskProgressBar.setVisibility(View.INVISIBLE);
 
         Uri profileIcon = user.getPhotoUrl();
 
@@ -119,12 +125,6 @@ public class ProfilePageActivity extends AppCompatActivity {
         pullGG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { restoreProcess(); }
-        });
-        statistic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "Not implemented yet.", Toast.LENGTH_SHORT).show();
-            }
         });
     }
 
@@ -240,6 +240,7 @@ public class ProfilePageActivity extends AppCompatActivity {
         }
         if (!backupFolderCreated) {
             Toast.makeText(this, "No backup folder detected.", Toast.LENGTH_SHORT).show();
+            return;
         }
         if (allMemoFolders.size() == 0) {
             Toast.makeText(this, "You don't have any memo to backup.", Toast.LENGTH_SHORT).show();
@@ -254,8 +255,12 @@ public class ProfilePageActivity extends AppCompatActivity {
             return;
         }
         isUploading = true;
+        taskRunning.setText("Uploading Files");
+        taskRunning.setVisibility(View.VISIBLE);
+        taskProgressBar.setProgress(0);
+        taskProgressBar.setVisibility(View.VISIBLE);
         Toast.makeText(this, "Backing up all of your memos. This could take a while.", Toast.LENGTH_LONG).show();
-        Task<Void> startUploadMemoFiles = driveServiceHelper.uploadBackupProcess(allMemoFolders, backupFolder.getId());
+        Task<Void> startUploadMemoFiles = driveServiceHelper.uploadBackupProcess(allMemoFolders, backupFolder.getId(), taskProgressBar, taskRunning);
         startUploadMemoFiles.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -266,12 +271,16 @@ public class ProfilePageActivity extends AppCompatActivity {
                     Toast.makeText(context, "Something has gone wrong. Please try again.", Toast.LENGTH_LONG).show();
                 }
                 isUploading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
         startUploadMemoFiles.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 isUploading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -318,25 +327,35 @@ public class ProfilePageActivity extends AppCompatActivity {
         }
         if (!backupFolderCreated) {
             Toast.makeText(this, "No backup folder detected.", Toast.LENGTH_SHORT).show();
+            return;
         }
         isDownloading = true;
+        taskRunning.setText("Downloading Files");
+        taskRunning.setVisibility(View.VISIBLE);
+        taskProgressBar.setProgress(0);
+        taskProgressBar.setVisibility(View.VISIBLE);
         Toast.makeText(this, "Downloading files from Drive. This could take a while.", Toast.LENGTH_SHORT).show();
-        Task<Void> startDownloadBackupProcess = driveServiceHelper.downloadBackupProcess(backupFolder.getId());
+        Task<Void> startDownloadBackupProcess = driveServiceHelper.downloadBackupProcess(backupFolder.getId(), taskProgressBar, taskRunning);
         startDownloadBackupProcess.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (startDownloadBackupProcess.isSuccessful()) {
+                    taskRunning.setText("Transferring files to app");
                     transferNewData();
                     return;
                 }
                 Toast.makeText(context, "Something has gone wrong. Please try again.", Toast.LENGTH_LONG).show();
                 isDownloading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
         startDownloadBackupProcess.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 isDownloading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -357,7 +376,10 @@ public class ProfilePageActivity extends AppCompatActivity {
             }
         }
         isDownloading = false;
+        taskProgressBar.setProgress(taskProgressBar.getProgress() + 1);
         Toast.makeText(this, "All data transfers completed.", Toast.LENGTH_LONG).show();
+        taskRunning.setVisibility(View.INVISIBLE);
+        taskProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
