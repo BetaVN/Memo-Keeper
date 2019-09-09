@@ -34,6 +34,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 
@@ -120,6 +122,50 @@ public class MainActivity extends AppCompatActivity{
                     Intent PROFILE = new Intent(context, SignInActivity.class);
                     startActivityForResult(PROFILE, REQUEST_CODE.SIGN_IN);
                 }
+                return true;
+
+            case R.id.action_sort_by_latest_changes:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        return Integer.valueOf(o2.memoDate).compareTo(o1.memoDate);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_name_ascending:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        char o1char = o1.memoTitle.charAt(0);
+                        char o2char = o2.memoTitle.charAt(0);
+                        return Integer.valueOf(o1char).compareTo((int)o2char);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_oldest_changes:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        return Integer.valueOf(o1.memoDate).compareTo(o2.memoDate);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_name_descending:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        char o1char = o1.memoTitle.charAt(0);
+                        char o2char = o2.memoTitle.charAt(0);
+                        return Integer.valueOf(o2char).compareTo((int)o1char);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
                 return true;
 
             default:
