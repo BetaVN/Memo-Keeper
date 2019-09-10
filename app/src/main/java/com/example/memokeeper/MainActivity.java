@@ -34,6 +34,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 
@@ -122,6 +124,50 @@ public class MainActivity extends AppCompatActivity{
                 }
                 return true;
 
+            case R.id.action_sort_by_latest_changes:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        return Integer.valueOf(o2.memoDate).compareTo(o1.memoDate);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_name_ascending:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        char o1char = o1.memoTitle.charAt(0);
+                        char o2char = o2.memoTitle.charAt(0);
+                        return Integer.valueOf(o1char).compareTo((int)o2char);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_oldest_changes:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        return Integer.valueOf(o1.memoDate).compareTo(o2.memoDate);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
+            case R.id.action_sort_by_name_descending:
+                Collections.sort(memo, new Comparator<MemoInfo>() {
+                    @Override
+                    public int compare(MemoInfo o1, MemoInfo o2) {
+                        char o1char = o1.memoTitle.charAt(0);
+                        char o2char = o2.memoTitle.charAt(0);
+                        return Integer.valueOf(o2char).compareTo((int)o1char);
+                    }
+                });
+                memoAdapter.notifyDataSetChanged();
+                return true;
+
             default:
                 return false;
         }
@@ -152,7 +198,7 @@ public class MainActivity extends AppCompatActivity{
             else if (ResultCode == RESULT_CANCELED) {
                 if (newMemoCreated) {
                     File deleteFolder = new File(getFilesDir().getAbsolutePath(), currentUnusedHash);
-                    deleteFolder.delete();
+                    PathUtils.folderClean(deleteFolder);
                     newMemoCreated = false;
                 }
             }
@@ -167,17 +213,22 @@ public class MainActivity extends AppCompatActivity{
             }
         }
         if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
-            if (ResultCode == RESULT_OK) {
+            if (ResultCode == REQUEST_CODE.RESULT_SIGN_OUT) {
                 if (data.getBooleanExtra("Sign out", false)) {
                     user = null;
                 }
             }
         }
+        if (RequestCode == REQUEST_CODE.VIEW_PROFILE) {
+            memo.clear();
+            memoGrabber = new MemoAsync();
+            memoGrabber.execute("");
+        }
     }
 
     private void updateView(ArrayList<MemoInfo> result) {
         if (memo.addAll(result)) {
-            memoAdapter.notifyItemInserted(memo.size() - 1);
+            memoAdapter.notifyDataSetChanged();
         }
     }
 
@@ -232,6 +283,19 @@ public class MainActivity extends AppCompatActivity{
             } else {
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST);
+
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.INTERNET)) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST);
 
             }
         }

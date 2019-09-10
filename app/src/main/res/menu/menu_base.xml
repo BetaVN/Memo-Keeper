@@ -7,6 +7,29 @@
         android:icon="@drawable/ic_profile"
         app:showAsAction="ifRoom"/>
     <item
+        android:title="Sort Memos"
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/action_sort_by_latest_changes"
+                android:title="Sort by latest changes"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/action_sort_by_oldest_changes"
+                android:title="Sort by oldest changes"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/action_sort_by_name_ascending"
+                android:title="Sort by name (A->Z)"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/action_sort_by_name_descending"
+                android:title="Sort by name (Z->A)"
+                app:showAsAction="never"/>
+        </menu>
+    </item>
+    <item
         android:title="Add Files"
         android:id="@+id/action_add_memo"
         android:icon="@drawable/ic_add"

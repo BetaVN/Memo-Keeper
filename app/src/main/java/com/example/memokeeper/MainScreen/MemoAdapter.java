@@ -22,6 +22,7 @@ import com.example.memokeeper.DatabaseHelper.MemoContract;
 import com.example.memokeeper.MemoEditor.MemoEditActivity;
 import com.example.memokeeper.R;
 import com.example.memokeeper.Utilities.DateUtils;
+import com.example.memokeeper.Utilities.PathUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,10 +48,8 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
         private final View.OnCreateContextMenuListener memoContextMenu = new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                MenuItem uploadMemo = menu.add("Save to Drive");
                 MenuItem deleteMemo = menu.add("Delete");
                 deleteMemo.setOnMenuItemClickListener(deleteMemoAction);
-                uploadMemo.setOnMenuItemClickListener(saveMemoAction);
             }
         };
 
@@ -68,7 +67,7 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
                         File deleteFolder = new File(context.getFilesDir().getAbsolutePath(), memoList.get(position).hash);
                         if (deleteFolder.exists()) {
                             Log.d("Delete", "Found");
-                            deleteFolder.delete();
+                            PathUtils.folderClean(deleteFolder);
                         }
                         memoList.remove(position);
                         notifyItemRemoved(position);
@@ -84,14 +83,6 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.MemoHolder> {
                 });
                 confirmDialog.show();
                 return true;
-            }
-        };
-
-        private final MenuItem.OnMenuItemClickListener saveMemoAction = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(context, "This feature is not yet implemented", Toast.LENGTH_SHORT).show();
-                return false;
             }
         };
     }

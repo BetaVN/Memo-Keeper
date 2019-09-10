@@ -25,10 +25,16 @@ import android.net.Uri;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.example.memokeeper.Constants.REQUEST_CODE;
+import com.example.memokeeper.MainScreen.MemoInfo;
+import com.example.memokeeper.Utilities.PathUtils;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -41,6 +47,8 @@ import com.google.api.services.drive.model.FileList;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -263,7 +271,6 @@ public class DriveServiceHelper {
                         FileList result = mDriveService.files().list().setQ("'" + parent + "' in parents").setFields("files(id, name,size,createdTime,modifiedTime,starred)").setSpaces("drive").execute();
 
                         for (int i = 0; i < result.getFiles().size(); i++) {
-
                             GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
                             googleDriveFileHolder.setId(result.getFiles().get(i).getId());
                             googleDriveFileHolder.setName(result.getFiles().get(i).getName());
@@ -389,5 +396,203 @@ public class DriveServiceHelper {
         });
     }
 
+    public Task<Void> uploadBackupProcess(ArrayList<MemoInfo> allMemo, String backupFolderID, ProgressBar progressTracker, TextView taskName) {
+        return Tasks.call(mExecutor, () -> {
+            int doneTask = 0;
+            progressTracker.setMax(allMemo.size());
+            for (MemoInfo memoInfo : allMemo) {
+                doneTask += 1;
+                FileList result = null;
+                // Retrieve the metadata as a File object.
+                try {
+                    result = mDriveService.files().list()
+                            .setQ("mimeType = '" + DriveFolder.MIME_TYPE + "' and name = '" + memoInfo.hash + "' ")
+                            .setSpaces("drive")
+                            .execute();
+                } catch (UserRecoverableAuthIOException e) {
+                    ((Activity) context).startActivityForResult(e.getIntent(), REQUEST_CODE.DRIVE_AUTH);
+                }
+                GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
+                if ((result != null) &&(result.getFiles().size() > 0)) {
+                    googleDriveFileHolder.setId(result.getFiles().get(0).getId());
+                    googleDriveFileHolder.setName(result.getFiles().get(0).getName());
 
+                }
+
+                if (googleDriveFileHolder.getId() != null) {
+                    mDriveService.files().delete(googleDriveFileHolder.getId()).execute();
+                }
+
+                GoogleDriveFileHolder newFolder = new GoogleDriveFileHolder();
+                String folderName = memoInfo.hash;
+
+                List<String> root;
+                root = Collections.singletonList(backupFolderID);
+
+                File metadata = new File()
+                        .setParents(root)
+                        .setMimeType(DriveFolder.MIME_TYPE)
+                        .setName(folderName);
+
+                File googleFile = mDriveService.files().create(metadata).execute();
+                if (googleFile == null) {
+                    throw new IOException("Null result when requesting file creation.");
+                }
+                newFolder.setId(googleFile.getId());
+                createNewMemoTextFile(memoInfo);
+                java.io.File[] memoFiles = new java.io.File(context.getFilesDir(), folderName).listFiles();
+                for (java.io.File memoFile: memoFiles) {
+                    List<String> root2;
+                    root2 = Collections.singletonList(newFolder.getId());
+                    String mimeType = getMimeType(memoFile);
+                    File metadata2 = new File()
+                            .setParents(root2)
+                            .setMimeType(mimeType)
+                            .setName(memoFile.getName());
+
+                    FileContent fileContent = new FileContent(mimeType, memoFile);
+
+                    File fileMeta = mDriveService.files().create(metadata2, fileContent).execute();
+                    GoogleDriveFileHolder newFile = new GoogleDriveFileHolder();
+                    newFile.setId(fileMeta.getId());
+                    newFile.setName(fileMeta.getName());
+                }
+                progressTracker.setProgress(doneTask);
+            }
+            return null;
+        });
+    }
+
+    public Task<Void> downloadBackupProcess(String backupFolderId, ProgressBar progressTracker, TextView taskName) {
+        return Tasks.call(mExecutor, () -> {
+            List<GoogleDriveFileHolder> allMemoFolder = findAllFiles(backupFolderId);
+            if (allMemoFolder.isEmpty()) {
+                return null;
+            }
+            int doneTask = 0;
+            progressTracker.setMax(allMemoFolder.size() + 1);
+            for (GoogleDriveFileHolder folder: allMemoFolder) {
+                doneTask += 1;
+                java.io.File memoDir = new java.io.File(context.getFilesDir(), folder.getName());
+                if (memoDir.exists()) {
+                    PathUtils.folderClean(memoDir);
+                }
+                memoDir.mkdir();
+                List<GoogleDriveFileHolder> allFilesInFolder = findAllFiles(folder.getId());
+                if (allFilesInFolder.isEmpty()) {
+                    continue;
+                }
+                for (GoogleDriveFileHolder file: allFilesInFolder) {
+                    java.io.File targetFile = new java.io.File(memoDir, file.getName());
+                    OutputStream outputStream = new FileOutputStream(targetFile);
+                    mDriveService.files().get(file.getId()).executeMediaAndDownloadTo(outputStream);
+                }
+                progressTracker.setProgress(doneTask);
+            }
+            return null;
+        });
+    }
+
+    private String getMimeType(java.io.File target) {
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        String mimeType = myMime.getMimeTypeFromExtension(target.getPath().substring(target.getPath().lastIndexOf(".") + 1));
+        return  mimeType;
+    }
+
+    private void createNewMemoTextFile(MemoInfo memoInfo) {
+        StringBuilder memoData = new StringBuilder();
+        memoData.append(memoInfo.memoTitle + "\n");
+        memoData.append(memoInfo.memoDate + "\n");
+        memoData.append(memoInfo.memoAttachment + "\n");
+        memoData.append(memoInfo.hash + "\n");
+        memoData.append("\n");
+        memoData.append(memoInfo.memoText + "\n");
+
+        try {
+            java.io.File newText = new java.io.File(context.getFilesDir() + "/" + memoInfo.hash + "/", memoInfo.hash + ".txt");
+            FileWriter writer = new FileWriter(newText);
+            writer.append(memoData.toString());
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public MemoInfo readFromMemoTextFile(java.io.File text) {
+        String memoTitle = "";
+        String memoAttachment = "";
+        String hash = "";
+        int memoDate = 0;
+        StringBuilder memoText = new StringBuilder();
+        memoText.append("");
+        try {
+            java.io.BufferedReader buf = new BufferedReader(new FileReader(text));
+            String line;
+
+
+            line = buf.readLine();
+            memoTitle = line;
+            line = buf.readLine();
+            memoDate = Integer.parseInt(line);
+            line = buf.readLine();
+            memoAttachment = line;
+            line = buf.readLine();
+            hash = line;
+            line = buf.readLine();
+            while ((line = buf.readLine()) != null) {
+                memoText.append(line + "\n");
+            }
+            buf.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        MemoInfo newInfo = new MemoInfo(memoTitle, memoDate, memoText.toString(), memoAttachment, hash);
+        Log.d("Memo Reader: ", "Title = " + memoTitle);
+        Log.d("Memo Reader: ", "Date = " + memoDate);
+        Log.d("Memo Reader: ", "Text = " + memoText.toString());
+        Log.d("Memo Reader: ", "Attachment = " + memoAttachment);
+        Log.d("Memo Reader: ", "Hash = " + hash);
+        return newInfo;
+    }
+
+    private List<GoogleDriveFileHolder> findAllFiles(String folderId) {
+        List<GoogleDriveFileHolder> googleDriveFileHolderList = new ArrayList<>();
+        String parent = "root";
+        if (folderId != null) {
+            parent = folderId;
+        }
+        try {
+            FileList result = mDriveService.files().list().setQ("'" + parent + "' in parents").setFields("files(id, name,size,createdTime,modifiedTime,starred)").setSpaces("drive").execute();
+
+            for (int i = 0; i < result.getFiles().size(); i++) {
+
+                GoogleDriveFileHolder googleDriveFileHolder = new GoogleDriveFileHolder();
+                googleDriveFileHolder.setId(result.getFiles().get(i).getId());
+                googleDriveFileHolder.setName(result.getFiles().get(i).getName());
+                if (result.getFiles().get(i).getSize() != null) {
+                    googleDriveFileHolder.setSize(result.getFiles().get(i).getSize());
+                }
+
+                if (result.getFiles().get(i).getModifiedTime() != null) {
+                    googleDriveFileHolder.setModifiedTime(result.getFiles().get(i).getModifiedTime());
+                }
+
+                if (result.getFiles().get(i).getCreatedTime() != null) {
+                    googleDriveFileHolder.setCreatedTime(result.getFiles().get(i).getCreatedTime());
+                }
+
+                if (result.getFiles().get(i).getStarred() != null) {
+                    googleDriveFileHolder.setStarred(result.getFiles().get(i).getStarred());
+                }
+
+                googleDriveFileHolderList.add(googleDriveFileHolder);
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return googleDriveFileHolderList;
+    }
 }

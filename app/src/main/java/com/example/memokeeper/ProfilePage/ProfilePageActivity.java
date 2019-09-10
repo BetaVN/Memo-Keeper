@@ -12,8 +12,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +23,17 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.memokeeper.Constants.REQUEST_CODE;
 import com.example.memokeeper.DatabaseHelper.MemoContract;
 import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.GoogleDriveHelper.GoogleDriveFileHolder;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,13 +44,8 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class ProfilePageActivity extends AppCompatActivity {
 
@@ -54,23 +54,25 @@ public class ProfilePageActivity extends AppCompatActivity {
     private Boolean grabbingAllHash = true;
     private Context context = this;
     private Boolean isUploading = false;
+    private Boolean isDownloading = false;
 
     private ImageView googleAvatar;
     private TextView googleEmail;
     private TextView googleName;
-    private TextView statistic;
     private TextView syncGG;
     private TextView pullGG;
-    private GoogleSignInAccount user;
-    private MenuInflater inflater;
+    private TextView taskRunning;
     private Toolbar profileToolbar;
+    private ProgressBar taskProgressBar;
+
+    private GoogleSignInAccount user;
+    private GoogleSignInClient client;
+    private MenuInflater inflater;
     private GoogleAccountCredential credential;
     private DriveServiceHelper driveServiceHelper;
     private MemoContract.MemoDbHelper dbHelper;
-    private MemoContract.BackupDbHelper backupDbHelper;
-    private ArrayList<String> allMemoFolders;
+    private ArrayList<MemoInfo> allMemoFolders;
     private MemoHashGrabber hashGrabber = new MemoHashGrabber();
-    private ArrayList<Task<?>> allConcurrentTasks = new ArrayList<>();
 
     private GoogleDriveFileHolder backupFolder;
 
@@ -81,9 +83,7 @@ public class ProfilePageActivity extends AppCompatActivity {
 
         backupFolderName = getString(R.string.backup_folder_name);
         dbHelper = new MemoContract().new MemoDbHelper(this);
-        backupDbHelper = new MemoContract().new BackupDbHelper(this);
         hashGrabber.execute("");
-
         Intent intent = getIntent();
         user = intent.getParcelableExtra("user");
 
@@ -91,9 +91,13 @@ public class ProfilePageActivity extends AppCompatActivity {
         googleEmail = findViewById(R.id.googleEmail);
         googleName = findViewById(R.id.googleName);
         profileToolbar = findViewById(R.id.profileToolbar);
-        statistic = findViewById(R.id.reportButton);
         syncGG = findViewById(R.id.syncButton);
         pullGG = findViewById(R.id.pullButton);
+        taskRunning = findViewById(R.id.taskRunning);
+        taskProgressBar = findViewById(R.id.progressBar);
+
+        taskRunning.setVisibility(View.INVISIBLE);
+        taskProgressBar.setVisibility(View.INVISIBLE);
 
         Uri profileIcon = user.getPhotoUrl();
 
@@ -111,6 +115,12 @@ public class ProfilePageActivity extends AppCompatActivity {
         Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("Memo Keeper").build();
         driveServiceHelper = new DriveServiceHelper(googleDriveService, this);
 
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        client = GoogleSignIn.getClient(context, googleSignInOptions);
+
         assignBackupFolder();
 
         setSupportActionBar(profileToolbar);
@@ -125,12 +135,6 @@ public class ProfilePageActivity extends AppCompatActivity {
         pullGG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { restoreProcess(); }
-        });
-        statistic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "Not implemented yet.", Toast.LENGTH_SHORT).show();
-            }
         });
     }
 
@@ -174,30 +178,33 @@ public class ProfilePageActivity extends AppCompatActivity {
 
     private void signOut() {
         Intent signOutIntent = new Intent();
+        client.signOut();
         signOutIntent.putExtra("Sign out", true);
-        setResult(RESULT_OK, signOutIntent);
+        setResult(REQUEST_CODE.RESULT_SIGN_OUT, signOutIntent);
         super.finish();
     }
 
-    private class MemoHashGrabber extends AsyncTask<String, Void, ArrayList<String>> {
+    private class MemoHashGrabber extends AsyncTask<String, Void, ArrayList<MemoInfo>> {
 
         @Override
-        protected ArrayList<String> doInBackground(String... strings) {
-            Cursor allMemoHash = dbHelper.getAllFolders();
-            ArrayList<String> allFolders = new ArrayList<>();
-            if (allMemoHash.moveToFirst()) {
+        protected ArrayList<MemoInfo> doInBackground(String... strings) {
+            Cursor allMemo = dbHelper.getAllMemo();
+            ArrayList<MemoInfo> memoList = new ArrayList<>();
+            if (allMemo.moveToFirst()) {
                 do {
-                    String hash = allMemoHash.getString(allMemoHash.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
-                    Log.d("Hash: ", hash + "" + Integer.toString(allMemoHash.getCount()));
-                    allFolders.add(hash);
-                } while (allMemoHash.moveToNext());
+                    String memoTitle = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_TITLE));
+                    String memoContent = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_CONTENT));
+                    String memoAttachment = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_ATTACHMENT));
+                    int date = allMemo.getInt(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_DATE));
+                    String hash = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
+                    memoList.add(new MemoInfo(memoTitle, date, memoContent, memoAttachment, hash));
+                } while (allMemo.moveToNext());
             }
-            allMemoHash.close();
-            Log.d("Hash: ", "Here?");
-            return allFolders;
+            allMemo.close();
+            return memoList;
         }
 
-        protected void onPostExecute(ArrayList<String> result) {
+        protected void onPostExecute(ArrayList<MemoInfo> result) {
             allMemoFolders = result;
             grabbingAllHash = false;
         }
@@ -244,60 +251,49 @@ public class ProfilePageActivity extends AppCompatActivity {
         }
         if (!backupFolderCreated) {
             Toast.makeText(this, "No backup folder detected.", Toast.LENGTH_SHORT).show();
+            return;
         }
         if (allMemoFolders.size() == 0) {
             Toast.makeText(this, "You don't have any memo to backup.", Toast.LENGTH_SHORT).show();
             return;
         }
-        isUploading = true;
-        uploadDatabase();
-        for (String hash: allMemoFolders) {
-            Toast.makeText(this, "Backing up memo...", Toast.LENGTH_SHORT).show();
-            Task<GoogleDriveFileHolder> checkForExistingFolders = driveServiceHelper.searchFolder(hash);
-            allConcurrentTasks.add(checkForExistingFolders);
-            checkForExistingFolders.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                @Override
-                public void onSuccess(GoogleDriveFileHolder result) {
-                    if (checkForExistingFolders.isSuccessful()) {
-                        if (result.getName() == null) {
-                            Log.d("Sync: ", "Begin new upload...");
-                            uploadNewMemoFolder(hash);
-                        }
-                        else {
-                            Log.d("Sync: ", "Overwriting folder...");
-                            Task<Void>  deleteCurrentFolder = driveServiceHelper.deleteFolderFile(result.getId());
-                            deleteCurrentFolder.addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    uploadNewMemoFolder(hash);
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-            checkForExistingFolders.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    e.printStackTrace();
-                }
-            });
+        if (isUploading) {
+            Toast.makeText(this, "The app is already backing up your files with Drive. Please wait.", Toast.LENGTH_SHORT);
+            return;
         }
-        Task<Void> checkUploadDone = driveServiceHelper.checkAllTaskProgress(allConcurrentTasks);
-        checkUploadDone.addOnSuccessListener(new OnSuccessListener<Void>() {
+        if (isDownloading) {
+            Toast.makeText(this, "The app is syncing files from Drive to your app. Please wait.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        isUploading = true;
+        taskRunning.setText("Uploading Files");
+        taskRunning.setVisibility(View.VISIBLE);
+        taskProgressBar.setProgress(0);
+        taskProgressBar.setVisibility(View.VISIBLE);
+        Toast.makeText(this, "Backing up all of your memos. This could take a while.", Toast.LENGTH_LONG).show();
+        Task<Void> startUploadMemoFiles = driveServiceHelper.uploadBackupProcess(allMemoFolders, backupFolder.getId(), taskProgressBar, taskRunning);
+        startUploadMemoFiles.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onSuccess(Void aVoid) {
+            public void onComplete(@NonNull Task<Void> task) {
+                if (startUploadMemoFiles.isSuccessful()) {
+                    Toast.makeText(context, "Memo backup is complete.", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Toast.makeText(context, "Something has gone wrong. Please try again.", Toast.LENGTH_LONG).show();
+                }
                 isUploading = false;
-                Toast.makeText(context, "Memo backup is complete.", Toast.LENGTH_LONG).show();
-                allConcurrentTasks.clear();
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
-    }
-
-    private String getMimeType(File target) {
-        MimeTypeMap myMime = MimeTypeMap.getSingleton();
-        String mimeType = myMime.getMimeTypeFromExtension(target.getPath().substring(target.getPath().lastIndexOf(".") + 1));
-        return  mimeType;
+        startUploadMemoFiles.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                isUploading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void assignBackupFolder() {
@@ -331,211 +327,98 @@ public class ProfilePageActivity extends AppCompatActivity {
         });
     }
 
-    private void uploadNewMemoFolder(String hash) {
-        Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder(hash, backupFolder.getId());
-        createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-            @Override
-            public void onSuccess(GoogleDriveFileHolder result) {
-                File[] memoFiles = new File(getFilesDir(), hash).listFiles();
-                for (File uploadFile: memoFiles) {
-                    String mimeType = getMimeType(uploadFile);
-                    Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(uploadFile, mimeType, result.getId());
-                    allConcurrentTasks.add(uploadFileTask);
-                    uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                        @Override
-                        public void onSuccess(GoogleDriveFileHolder result) {
-                            Log.d("Sync: ", "File " + uploadFile.getName() + " uploaded...");
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    private void uploadDatabase() {
-        File database = getDatabasePath(MemoContract.MemoDbHelper.DATABASE_NAME);
-        Task<GoogleDriveFileHolder> checkForExistingFolders = driveServiceHelper.searchFolder("databases");
-        checkForExistingFolders.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-            @Override
-            public void onSuccess(GoogleDriveFileHolder result) {
-                if (checkForExistingFolders.isSuccessful()) {
-                    if (result.getName() == null) {
-                        Log.d("Sync: ", "Begin new upload...");
-                        Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
-                        createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                            @Override
-                            public void onSuccess(GoogleDriveFileHolder result) {
-                                Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
-                                allConcurrentTasks.add(uploadFileTask);
-                                uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                                    @Override
-                                    public void onSuccess(GoogleDriveFileHolder result) {
-                                        Log.d("Sync: ", "Database updated.");
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    else {
-                        Log.d("Sync: ", "Overwriting folder...");
-                        Task<Void>  deleteCurrentFolder = driveServiceHelper.deleteFolderFile(result.getId());
-                        deleteCurrentFolder.addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Task<GoogleDriveFileHolder> createNewFolder = driveServiceHelper.createFolder("databases", backupFolder.getId());
-                                createNewFolder.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                                    @Override
-                                    public void onSuccess(GoogleDriveFileHolder result) {
-                                        Task<GoogleDriveFileHolder> uploadFileTask = driveServiceHelper.uploadFile(database, getMimeType(database), result.getId());
-                                        allConcurrentTasks.add(uploadFileTask);
-                                        uploadFileTask.addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
-                                            @Override
-                                            public void onSuccess(GoogleDriveFileHolder result) {
-                                                Log.d("Sync: ", "Database updated.");
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        checkForExistingFolders.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
     private void restoreProcess() {
         if (isUploading) {
-            Toast.makeText(this, "Currently uploading backup files. Please wait.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The app is backing up your files with Drive. Please wait.", Toast.LENGTH_SHORT);
             return;
         }
-        File backupDirectory = new File(getFilesDir(), "temp");
-        if (backupDirectory.exists()) {
-            backupDirectory.delete();
+        if (isDownloading) {
+            Toast.makeText(this, "The app is already syncing files from Drive to your app. Please wait.", Toast.LENGTH_LONG).show();
+            return;
         }
-        Task<List<GoogleDriveFileHolder>> backupFileList = driveServiceHelper.queryFiles(backupFolder.getId());
-        backupFileList.addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+        if (!backupFolderCreated) {
+            Toast.makeText(this, "No backup folder detected.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isDownloading = true;
+        taskRunning.setText("Downloading Files");
+        taskRunning.setVisibility(View.VISIBLE);
+        taskProgressBar.setProgress(0);
+        taskProgressBar.setVisibility(View.VISIBLE);
+        Toast.makeText(this, "Downloading files from Drive. This could take a while.", Toast.LENGTH_SHORT).show();
+        Task<Void> startDownloadBackupProcess = driveServiceHelper.downloadBackupProcess(backupFolder.getId(), taskProgressBar, taskRunning);
+        startDownloadBackupProcess.addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onSuccess(List<GoogleDriveFileHolder> result) {
-                if (!backupDirectory.exists()) {
-                    backupDirectory.mkdir();
+            public void onComplete(@NonNull Task<Void> task) {
+                if (startDownloadBackupProcess.isSuccessful()) {
+                    taskRunning.setText("Transferring files to app");
+                    transferNewData();
+                    return;
                 }
-                for (GoogleDriveFileHolder file: result) {
-                    pullFolderFromDrive(file, backupDirectory);
-                }
-                Task<Void> checkDownloadDone = driveServiceHelper.checkAllTaskProgress(allConcurrentTasks);
-                checkDownloadDone.addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Memo download is complete.", Toast.LENGTH_LONG).show();
-                        allConcurrentTasks.clear();
-                        updateNewFilesFromBackup(backupDirectory);
-                    }
-                });
+                Toast.makeText(context, "Something has gone wrong. Please try again.", Toast.LENGTH_LONG).show();
+                isDownloading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
-
-    }
-
-    private void pullFolderFromDrive(GoogleDriveFileHolder result, File backupDir) {
-        File newMemoFolder = new File(backupDir.getAbsolutePath(), result.getName());
-        if (!newMemoFolder.exists()) {
-            newMemoFolder.mkdir();
-        }
-        Task<List<GoogleDriveFileHolder>> allFiles = driveServiceHelper.queryFiles(result.getId());
-        allFiles.addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
+        startDownloadBackupProcess.addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onSuccess(List<GoogleDriveFileHolder> memoFiles) {
-                for (GoogleDriveFileHolder memoFile: memoFiles) {
-                    Task<Void> downloadFile = driveServiceHelper.downloadFile(newMemoFolder, memoFile.getId());
-                    allConcurrentTasks.add(downloadFile);
-                    downloadFile.addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("Download: ", memoFile.getName() + "");
-                        }
-                    });
-                }
+            public void onFailure(@NonNull Exception e) {
+                isDownloading = false;
+                taskRunning.setVisibility(View.INVISIBLE);
+                taskProgressBar.setVisibility(View.INVISIBLE);
             }
         });
     }
 
-    private void updateNewFilesFromBackup(File backupDir) {
-        File[] listOfFolders = backupDir.listFiles();
-        for (File folder: listOfFolders) {
-            if (folder.isDirectory()) {
-                if (folder.getName().equals("databases")) {
-                    Log.d("Database: ", "Ok, we are here?");
-                    File database = new File(folder.getAbsolutePath(), MemoContract.MemoEntry.TABLE_NAME + ".db");
-                    File newDatabase = new File(folder.getAbsolutePath(), MemoContract.MemoEntry.BACKUP_TABLE_NAME + ".db");
-                    if (database.exists()) {
-                        database.renameTo(newDatabase);
-                    }
-                    File databaseDir = new File(getDatabasePath(MemoContract.MemoEntry.TABLE_NAME).getParent());
-                    moveFile(newDatabase, databaseDir);
-                    File test = new File(databaseDir, MemoContract.MemoEntry.BACKUP_TABLE_NAME + ".db");
-                    Log.d("Database: ", "New database moved?: " + Boolean.toString(test.exists()));
-                    Cursor allMemo = backupDbHelper.getAllMemo();
-                    ArrayList<MemoInfo> memoList = new ArrayList<>();
-                    if (allMemo.moveToFirst()) {
-                        do {
-                            String memoTitle = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_TITLE));
-                            String memoContent = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_CONTENT));
-                            String memoAttachment = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_ATTACHMENT));
-                            int date = allMemo.getInt(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_DATE));
-                            String hash = allMemo.getString(allMemo.getColumnIndex(MemoContract.MemoEntry.COLLUMN_MEMO_HASH));
-                            memoList.add(new MemoInfo(memoTitle, date, memoContent, memoAttachment, hash));
-                        } while (allMemo.moveToNext());
-                    }
-                    allMemo.close();
-                    dbHelper.updateFromBackup(memoList);
+    private void transferNewData() {
+        File[] listFiles = getFilesDir().listFiles();
+        for (File memo: listFiles) {
+            if (memo.isDirectory()) {
+                File memoText = new File(memo, memo.getName() + ".txt");
+                Log.d("Path: ", memoText.getAbsolutePath() + "");
+                if (!memoText.exists()) {
                     continue;
                 }
-                File currentFolder = new File(getFilesDir(), folder.getName());
-                if (!currentFolder.exists()) {
-                    currentFolder.mkdir();
-                    File[] files = folder.listFiles();
-                    for (File file: files) {
-                        moveFile(file, currentFolder);
-                    }
-                }
-                else {
-                    File[] removeCurrentFiles = currentFolder.listFiles();
-                    for (File file: removeCurrentFiles) {
-                        file.delete();
-                    }
-                    File[] files = folder.listFiles();
-                    for (File file: files) {
-                        moveFile(file, currentFolder);
-                    }
+                MemoInfo newMemoInfo = driveServiceHelper.readFromMemoTextFile(memoText);
+                if (!dbHelper.addNewMemo(newMemoInfo)) {
+                    dbHelper.updateMemo(newMemoInfo);
                 }
             }
+        }
+        isDownloading = false;
+        taskProgressBar.setProgress(taskProgressBar.getProgress() + 1);
+        Toast.makeText(this, "All data transfers completed.", Toast.LENGTH_LONG).show();
+        taskRunning.setVisibility(View.INVISIBLE);
+        taskProgressBar.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isDownloading || isUploading) {
+            AlertDialog.Builder confirmDialog = new AlertDialog.Builder(ProfilePageActivity.this);
+            confirmDialog.setTitle("Confirmation");
+            confirmDialog.setMessage("Current backup tasks are still running. Do you want to return?");
+            confirmDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitActivity();
+                }
+            });
+            confirmDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            confirmDialog.show();
+        }
+        else {
+            exitActivity();
         }
     }
 
-    private void moveFile(File newFile, File targetDir) {
-        try {
-            FileInputStream inputStream = new FileInputStream(newFile);
-            Log.d("Output loc", targetDir.getAbsolutePath() + "");
-            FileOutputStream outputStream = new FileOutputStream(targetDir);
-            byte[] b = new byte[1024];
-            int len;
-            while ((len = inputStream.read(b)) > 0) {
-                outputStream.write(b, 0, len);
-            }
-            inputStream.close();
-            outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e1) {
-            e1.printStackTrace();
-        }
+    public void exitActivity() {
+        super.finish();
     }
 }
+
