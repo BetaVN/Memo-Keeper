@@ -104,30 +104,19 @@ public class AttachItemAdapter extends RecyclerView.Adapter<AttachItemAdapter.It
         itemHolder.fileName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (android.os.Build.VERSION.SDK_INT < 24) {
-                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                    File file = new File(newItem.filePath);
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
-                    intent.setDataAndType(Uri.fromFile(file), mimeType);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                File file = new File(newItem.filePath);
+                Uri data = FileProvider.getUriForFile(context, "com.example.memokeeper.FileProvider", file);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
+                intent.setDataAndType(data, mimeType);
+                PackageManager pm = context.getPackageManager();
+                if (intent.resolveActivity(pm) != null) {
                     try {
                         context.startActivity(intent);
                     } catch (ActivityNotFoundException e) {
                         Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
-                    }
-                }
-                else {
-                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    File file = new File(newItem.filePath);
-                    Uri data = FileProvider.getUriForFile(context, "com.example.memokeeper.FileProvider", file);
-                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    String mimeType = myMime.getMimeTypeFromExtension(newItem.filePath.substring(newItem.filePath.lastIndexOf(".") + 1));
-                    intent.setDataAndType(data, mimeType);
-                    PackageManager pm = context.getPackageManager();
-                    if (intent.resolveActivity(pm) != null) {
-                        context.startActivity(intent);
                     }
                 }
             }

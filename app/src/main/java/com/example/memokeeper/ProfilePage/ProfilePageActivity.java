@@ -29,7 +29,10 @@ import com.example.memokeeper.GoogleDriveHelper.DriveServiceHelper;
 import com.example.memokeeper.GoogleDriveHelper.GoogleDriveFileHolder;
 import com.example.memokeeper.MainScreen.MemoInfo;
 import com.example.memokeeper.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,6 +66,7 @@ public class ProfilePageActivity extends AppCompatActivity {
     private ProgressBar taskProgressBar;
 
     private GoogleSignInAccount user;
+    private GoogleSignInClient client;
     private MenuInflater inflater;
     private GoogleAccountCredential credential;
     private DriveServiceHelper driveServiceHelper;
@@ -110,6 +114,12 @@ public class ProfilePageActivity extends AppCompatActivity {
         credential.setSelectedAccount(user.getAccount());
         Drive googleDriveService = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).setApplicationName("Memo Keeper").build();
         driveServiceHelper = new DriveServiceHelper(googleDriveService, this);
+
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        client = GoogleSignIn.getClient(context, googleSignInOptions);
 
         assignBackupFolder();
 
@@ -168,6 +178,7 @@ public class ProfilePageActivity extends AppCompatActivity {
 
     private void signOut() {
         Intent signOutIntent = new Intent();
+        client.signOut();
         signOutIntent.putExtra("Sign out", true);
         setResult(REQUEST_CODE.RESULT_SIGN_OUT, signOutIntent);
         super.finish();

@@ -45,15 +45,27 @@ public class PathUtils {
 
             } else if (isDownloadsDocument(uri)) {// DownloadsProvider
 
-                final String id = DocumentsContract.getDocumentId(uri);
+                /*final String id = DocumentsContract.getDocumentId(uri);
                 final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
                 String path = "";
                 try {
                     path = getDataColumn(context, contentUri, null, null);
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                     return null;
                 }
-                return path;
+                return path;*/
+
+                String fileName = getDownloadName(context, uri, null, null);
+                if (fileName != null) {
+                    String uriToReturn = Uri.withAppendedPath(Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()), fileName).toString();
+                    Log.d("Fetch Download: ", uriToReturn + "");
+                    return uriToReturn;
+                }
+                else {
+                    return "";
+                }
+
 
             } else if (isMediaDocument(uri)) {// MediaProvider
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -96,6 +108,27 @@ public class PathUtils {
 
         Cursor cursor = null;
         final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    public static String getDownloadName(Context context, Uri uri, String selection, String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = DocumentsContract.Document.COLUMN_DISPLAY_NAME;
         final String[] projection = {
                 column
         };

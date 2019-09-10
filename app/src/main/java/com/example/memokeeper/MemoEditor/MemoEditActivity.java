@@ -313,5 +313,8 @@ public class MemoEditActivity extends AppCompatActivity {
         super.finish();
     }
 
-
+    @Override
+    public void onBackPressed() {
+        exitMemo();
+    }
 }
